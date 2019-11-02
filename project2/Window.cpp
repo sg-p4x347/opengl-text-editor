@@ -10,15 +10,13 @@ Window::Window(
 	double left, 
 	double right,
 	double bottom, 
-	double top, 
-	std::function<void()>&& render
+	double top
 ) :
 	m_title(title), 
 	m_left(left), 
 	m_right(right), 
 	m_bottom(bottom), 
-	m_top(top), 
-	m_render(std::move(render))
+	m_top(top)
 {
 	// specify a window size
 	glutInitWindowSize(size.x, size.y);
@@ -62,6 +60,7 @@ void Window::Hide()
 
 Vector2 Window::ScreenToWorld(Vector2 screen)
 {
+	Select();
 	float xRatio = (screen.x / (float)glutGet(GLUT_WINDOW_WIDTH)) * (m_right - m_left);
 	float yRatio = (1.f - (screen.y / (float)glutGet(GLUT_WINDOW_HEIGHT))) * (m_top - m_bottom);
 	return Vector2(
@@ -70,14 +69,20 @@ Vector2 Window::ScreenToWorld(Vector2 screen)
 	);
 }
 
+void Window::SetRender(std::function<void()>&& render)
+{
+	m_render = render;
+}
+
 void Window::Render()
 {
 	g_windows[glutGetWindow()]->m_render();
 }
 
-void Window::Create(shared_ptr<Window> window)
+shared_ptr<Window> Window::Create(shared_ptr<Window> window)
 {
 	g_windows.insert(std::make_pair(window->GetID(), window));
+	return window;
 }
 
 void Window::Delete(int id)

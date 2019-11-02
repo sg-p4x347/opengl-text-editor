@@ -13,8 +13,7 @@ public:
 		double left, 
 		double right, 
 		double bottom, 
-		double top, 
-		std::function<void()>&& render = []() {}
+		double top
 	);
 	~Window();
 	void Select();
@@ -22,8 +21,11 @@ public:
 	void Show();
 	void Hide();
 	Vector2 ScreenToWorld(Vector2 screen);
+	// Callbacks
+	void SetRender(std::function<void()>&& render);
+
 	static void Render();
-	static void Create(shared_ptr<Window> window);
+	static shared_ptr<Window> Create(shared_ptr<Window> window);
 	static void Delete(int id);
 protected:
 
