@@ -18,6 +18,12 @@ Window::Window(
 	m_bottom(bottom), 
 	m_top(top)
 {
+	// Initialize gl
+	
+	glutInitDisplayMode(GLUT_ALPHA);
+	glClearColor(1.f,1.f,1.f, 1.f);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	// specify a window size
 	glutInitWindowSize(size.x, size.y);
 	// specify a window position
