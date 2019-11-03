@@ -15,25 +15,29 @@
 	3.		Press Ctrl+F5					to EXECUTE
 -----------------------------------------------------------------------------------------*/
 #include "pch.h"
-#include <GL/glut.h>				// include GLUT library
+//#include <GL/glut.h>				// include GLUT library
 #include "TextEditorWindow.h"
-
+#include "Word.h"
 
 int main(int argc, char ** argv) {
-	glutInit(&argc, argv);
-	
-	// create a generic help window
-	Window::Create(std::make_shared<Window>("Help", Vector2(400, 0), Vector2(400, 200), -200, 200, -200, 200, [=]() {
-		// draw the background
-		glClear(GL_COLOR_BUFFER_BIT);
-		// flush out the buffer contents
-		glFlush();
-	}));
+	//glutInit(&argc, argv);
+	//
+	//// create a generic help window
+	//Window::Create(std::make_shared<Window>("Help", Vector2(400, 0), Vector2(400, 200), -200, 200, -200, 200, [=]() {
+	//	// draw the background
+	//	glClear(GL_COLOR_BUFFER_BIT);
+	//	// flush out the buffer contents
+	//	glFlush();
+	//}));
 
-	// create a specialized text-editor window
-	Window::Create(std::make_shared<TextEditorWindow>());
+	//// create a specialized text-editor window
+	//Window::Create(std::make_shared<TextEditorWindow>());
 
-	glutMainLoop();
-	
+	//glutMainLoop();
+	//
+	/* test*/
+	Word word = Word("first", "second", .585, .25, .54);
+	cout << word.GetText();
+
 	return 0;
 }
