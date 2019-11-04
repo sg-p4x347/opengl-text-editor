@@ -36,6 +36,12 @@
     <ClCompile Include="Word.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Document.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TextEditor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -60,6 +66,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Word.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Document.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TextEditor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

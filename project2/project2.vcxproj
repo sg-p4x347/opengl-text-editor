@@ -126,7 +126,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Color.cpp" />
+    <ClCompile Include="Document.cpp" />
     <ClCompile Include="Font.cpp" />
+    <ClCompile Include="TextEditor.cpp" />
     <ClCompile Include="TextEditorWindow.cpp" />
     <ClCompile Include="Vector2.cpp" />
     <ClCompile Include="Window.cpp" />
@@ -138,8 +140,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Color.h" />
+    <ClInclude Include="Document.h" />
     <ClInclude Include="Font.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="TextEditor.h" />
     <ClInclude Include="TextEditorWindow.h" />
     <ClInclude Include="Vector2.h" />
     <ClInclude Include="Window.h" />
