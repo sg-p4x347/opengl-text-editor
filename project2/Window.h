@@ -23,8 +23,14 @@ public:
 	Vector2 ScreenToWorld(Vector2 screen);
 	// Callbacks
 	void SetRender(std::function<void()>&& render);
-
+	void SetIdle(std::function<void()>&& idle);
+	void SetMouseFunc(std::function<void(int, int, int, int)>&& mouseFunc);
+	void SetKeyboardFunc(std::function<void(unsigned char, int, int)>&& keyboardFunc);
 	static void Render();
+	static void Idle();
+	static void MouseFunc(int button, int state, int x, int y);
+	static void KeyboardFunc(unsigned char key, int x, int y);
+
 	static shared_ptr<Window> Create(shared_ptr<Window> window);
 	static void Delete(int id);
 protected:
@@ -35,6 +41,10 @@ protected:
 	double m_right;
 	double m_bottom;
 	double m_top;
+
 	std::function<void()> m_render;
+	std::function<void()> m_idle;
+	std::function<void(int, int, int, int)> m_mouseFunc;
+	std::function<void(unsigned char, int, int)> m_keyboardFunc;
 };
 static map<int, shared_ptr<Window>> g_windows;

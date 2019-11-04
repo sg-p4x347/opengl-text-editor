@@ -18,22 +18,23 @@ Window::Window(
 	m_bottom(bottom), 
 	m_top(top)
 {
-	// Initialize gl
-	
-	glutInitDisplayMode(GLUT_ALPHA);
-	glClearColor(1.f,1.f,1.f, 1.f);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	// specify a window size
 	glutInitWindowSize(size.x, size.y);
 	// specify a window position
 	glutInitWindowPosition(position.x, position.y);
 	m_id = glutCreateWindow(title.c_str());
-	// specify a background clor: white
-	glClearColor(1, 1, 1, 0);
 	// specify a viewing area
 	gluOrtho2D(left, right, bottom, top);
+	// Register callbacks
 	glutDisplayFunc(Window::Render);
+	glutIdleFunc(Window::Idle);
+	glutMouseFunc(Window::MouseFunc);
+	glutKeyboardFunc(Window::KeyboardFunc);
+	// Initialize rendering configurations
+	glutInitDisplayMode(GLUT_ALPHA);
+	glClearColor(1.f, 1.f, 1.f, 1.f);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 Window::~Window()
@@ -80,9 +81,43 @@ void Window::SetRender(std::function<void()>&& render)
 	m_render = render;
 }
 
+void Window::SetIdle(std::function<void()>&& idle)
+{
+	m_idle = idle;
+}
+
+void Window::SetMouseFunc(std::function<void(int, int, int, int)>&& mouseFunc)
+{
+	m_mouseFunc = mouseFunc;
+}
+
+void Window::SetKeyboardFunc(std::function<void(unsigned char, int, int)>&& keyboardFunc)
+{
+	m_keyboardFunc = keyboardFunc;
+}
+
 void Window::Render()
 {
-	g_windows[glutGetWindow()]->m_render();
+	if (g_windows.count(glutGetWindow()))
+		g_windows[glutGetWindow()]->m_render();
+}
+
+void Window::Idle()
+{
+	/*if (g_windows.count(glutGetWindow()))
+		g_windows[glutGetWindow()]->m_idle();*/
+}
+
+void Window::MouseFunc(int button, int state, int x, int y)
+{
+	if (g_windows.count(glutGetWindow()))
+		g_windows[glutGetWindow()]->m_mouseFunc(button, state, x, y);
+}
+
+void Window::KeyboardFunc(unsigned char key, int x, int y)
+{
+	if (g_windows.count(glutGetWindow()))
+		g_windows[glutGetWindow()]->m_keyboardFunc(key, x, y);
 }
 
 shared_ptr<Window> Window::Create(shared_ptr<Window> window)

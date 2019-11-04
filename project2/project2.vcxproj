@@ -81,7 +81,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Create</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <LanguageStandard>stdcpp14</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)freetype/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -132,6 +132,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Bitmap.cpp" />
+    <ClCompile Include="Color.cpp" />
+    <ClCompile Include="Font.cpp" />
+    <ClCompile Include="FontUtil.cpp" />
     <ClCompile Include="Pixel.cpp" />
     <ClCompile Include="TextEditorWindow.cpp" />
     <ClCompile Include="Vector2.cpp" />
@@ -146,6 +149,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bitmap.h" />
+    <ClInclude Include="Color.h" />
+    <ClInclude Include="Font.h" />
+    <ClInclude Include="FontUtil.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Pixel.h" />
     <ClInclude Include="TextEditorWindow.h" />

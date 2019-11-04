@@ -9,7 +9,9 @@
 #include <string>
 #include <functional>
 #include <algorithm>
+#include <filesystem>
 
+using std::filesystem::path;
 using std::ifstream;
 using std::ofstream;
 using std::vector;
