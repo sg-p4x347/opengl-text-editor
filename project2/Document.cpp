@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "Document.h"
 
 Document::Document()
@@ -14,6 +15,10 @@ Document::Document(string text, vector<string> fonts, vector<Color> colors, vect
 	setSize(sizes);
 	setName("CopyOf" + name);
 	setCaratPosition(caratPosition);
+}
+
+Document::~Document()
+{
 }
 
 void Document::setText(string text)
@@ -49,6 +54,12 @@ void Document::changeFont(string font, int startIndex, int endIndex)
 	}
 }
 
+void Document::insertFont(string font, int index)
+{
+	// Not implemented
+	assert(false);
+}
+
 void Document::removeFont(int startIndex, int endIndex)
 {
 	m_fonts.erase(m_fonts.begin() + startIndex, m_fonts.begin() + endIndex);
@@ -72,6 +83,12 @@ void Document::changeColor(Color color, int startIndex, int endIndex)
 	}
 }
 
+void Document::insertColor(Color color, int index)
+{
+	// Not implemented
+	assert(false);
+}
+
 void Document::removeColor(int startIndex, int endIndex)
 {
 	m_colors.erase(m_colors.begin() + startIndex, m_colors.begin() + endIndex);
@@ -93,6 +110,12 @@ void Document::changeSize(int size, int startIndex, int endIndex)
 	{
 		m_sizes[index] = size;
 	}
+}
+
+void Document::insertSize(int size, int index)
+{
+	// Not implemented
+	assert(false);
 }
 
 void Document::removeSize(int startIndex, int endIndex)

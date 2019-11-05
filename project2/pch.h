@@ -10,6 +10,7 @@
 #include <functional>
 #include <algorithm>
 #include <filesystem>
+#include <cassert>
 
 using std::filesystem::path;
 using std::ifstream;

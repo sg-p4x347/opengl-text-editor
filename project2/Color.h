@@ -1,18 +1,11 @@
 #pragma once
 #include "pch.h"
 
-class Color {
-public:
-	Color(double r, double g, double b);
-	void SetColor(double r, double g, double b);
-	double GetRed();
-	double GetGreen();
-	double GetBlue();
-	void SetRed(double r);
-	void SetGreen(double g);
-	void SetBlue(double b);
+struct Color {
+	Color(double r = 0.0, double g = 0.0, double b = 0.0, double a = 1.0);
 
-	double red;
-	double green;
-	double blue;
+	double R;
+	double G;
+	double B;
+	double A;
 };

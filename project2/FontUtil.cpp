@@ -108,8 +108,8 @@ void FontUtil::Render(Window& window, Vector2 position, string text, string font
 		Bitmap bmp(slot->bitmap.width, slot->bitmap.rows);
 		for (int x = 0; x < bmp.GetWidth(); x++) {
 			for (int y = 0; y < bmp.GetHeight(); y++) {
-				uint8_t alpha = slot->bitmap.buffer[y * slot->bitmap.width + x];
-				bmp.Set(x, (bmp.GetHeight() - 1) - y, Pixel(color.R, color.G, color.B, (uint8_t)((alpha / 255.f * color.A / 255.f) * 255.f)));
+				uint8_t A = slot->bitmap.buffer[y * slot->bitmap.width + x];
+				bmp.Set(x, (bmp.GetHeight() - 1) - y, Pixel(color.R * 255, color.G * 255, color.B * 255, ((A / 255.f) * color.A) * 255));
 			}
 		}
 		Vector2 world = window.ScreenToWorld(Vector2(position.x + slot->bitmap_left, (position.y + slot->bitmap.rows) - slot->bitmap_top));

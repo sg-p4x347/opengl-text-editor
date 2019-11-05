@@ -15,7 +15,7 @@
 	3.		Press Ctrl+F5					to EXECUTE
 -----------------------------------------------------------------------------------------*/
 #include "pch.h"
-//#include <GL/glut.h>				// include GLUT library
+#include <GL/glut.h>				// include GLUT library
 #include "TextEditorWindow.h"
 #include "Bitmap.h"
 #include "Window.h"

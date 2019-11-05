@@ -3335,7 +3335,7 @@ FT_BEGIN_HEADER
    *   dark on both bright and dark backgrounds.  The net result is that dark
    *   text looks burnt-out, pixely and blotchy on bright background, bright
    *   text too frail on dark backgrounds, and colored text on colored
-   *   background (for example, red on green) seems to have dark halos or
+   *   background (for example, R on green) seems to have dark halos or
    *   'dirt' around it.  The situation is especially ugly for diagonal stems
    *   like in 'w' glyph shapes where the quality of FreeType's anti-aliasing
    *   depends on the correct display of grays.  On high-DPI screens where
