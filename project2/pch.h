@@ -3,10 +3,17 @@
 #include <map>
 #include <utility>
 #include <iostream>
+#include <fstream>
+#include <istream>
 #include <memory>
 #include <string>
 #include <functional>
+#include <algorithm>
+#include <filesystem>
 
+using std::filesystem::path;
+using std::ifstream;
+using std::ofstream;
 using std::vector;
 using std::string;
 using std::unique_ptr;

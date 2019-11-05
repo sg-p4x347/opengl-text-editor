@@ -1,20 +1,6 @@
+#include "pch.h"
 #include "Font.h"
 
-Font::Font(string fontname)
+Font::Font(string name) : Name(name)
 {
-	font = fontname;
-}
-
-Font::~Font()
-{
-}
-
-void Font::SetFont(string fontname)
-{
-	font = fontname;
-}
-
-string Font::GetFont(string font)
-{
-	return font;
 }
