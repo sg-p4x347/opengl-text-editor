@@ -76,7 +76,15 @@ void TextEditorWindow::UpdateWords()
 
 void TextEditorWindow::RenderWord(Word& word, Vector2& pen, size_t& rowHeight, uint32_t& charIndex, uint32_t& carat, int & windowWidth)
 {
-	int index = FontUtil::NearestCharacterIndex(word.Text, word.Font, word.Size, windowWidth - pen.x);
+	
+
+	uint32_t index = FontUtil::NearestCharacterIndex(word.Text, word.Font, word.Size, windowWidth - pen.x);
+	uint32_t carriageReturn = word.Text.find('\r');
+	if (carriageReturn != string::npos && carriageReturn <= index) {
+		index = carriageReturn;
+		word.Text.erase(carriageReturn, 1);
+		charIndex++;
+	}
 	if (index < word.Text.length() || pen.x >= windowWidth) {
 
 		if (index < word.Text.length()) {

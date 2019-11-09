@@ -26,7 +26,7 @@ public:
 		Color color
 	);
 	// Returns the index within the string that is closest to the pixel offset given
-	static int NearestCharacterIndex(
+	static uint32_t NearestCharacterIndex(
 		// The text to measure
 		string text,
 		// The font to use
