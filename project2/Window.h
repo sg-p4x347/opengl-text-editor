@@ -21,15 +21,22 @@ public:
 	void Show();
 	void Hide();
 	Vector2 ScreenToWorld(Vector2 screen);
-	// Callbacks
-	void SetRender(std::function<void()>&& render);
-	void SetIdle(std::function<void()>&& idle);
-	void SetMouseFunc(std::function<void(int, int, int, int)>&& mouseFunc);
-	void SetKeyboardFunc(std::function<void(unsigned char, int, int)>&& keyboardFunc);
-	static void Render();
-	static void Idle();
-	static void MouseFunc(int button, int state, int x, int y);
-	static void KeyboardFunc(unsigned char key, int x, int y);
+	// Dispatchers
+	static void DisplayFuncDispatcher();
+	static void IdleFuncDispatcher();
+	static void MouseFuncDispatcher(int button, int state, int x, int y);
+	static void KeyboardFuncDispatcher(unsigned char key, int x, int y);
+	static void KeyboardUpFuncDispatcher(unsigned char key, int x, int y);
+	static void SpecialFuncDispatcher(int key, int x, int y);
+	static void SpecialUpFuncDispatcher(int key, int x, int y);
+	// Virtual callbacks
+	virtual void DisplayFunc();
+	virtual void IdleFunc();
+	virtual void MouseFunc(int button, int state, int x, int y);
+	virtual void KeyboardFunc(unsigned char key, int x, int y);
+	virtual void KeyboardUpFunc(unsigned char key, int x, int y);
+	virtual void SpecialFunc(int key, int x, int y);
+	virtual void SpecialUpFunc(int key, int x, int y);
 
 	static shared_ptr<Window> Create(shared_ptr<Window> window);
 	static void Delete(int id);
@@ -42,9 +49,7 @@ protected:
 	double m_bottom;
 	double m_top;
 
-	std::function<void()> m_render;
-	std::function<void()> m_idle;
-	std::function<void(int, int, int, int)> m_mouseFunc;
-	std::function<void(unsigned char, int, int)> m_keyboardFunc;
+	map<char, bool> m_keys;
+	map<int, bool> m_specialKeys;
 };
 static map<int, shared_ptr<Window>> g_windows;
