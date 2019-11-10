@@ -1,55 +1,153 @@
 #pragma once
 #include "pch.h"
 #include "Color.h"
-#include <fstream>
+#include "Style.h"
 
 using std::ofstream;
 
 class Document
 {
-private:
-	string m_text;
-	vector<string> m_fonts;
-	vector<Color> m_colors;
-	vector<int> m_sizes;
-	string m_name;
-	int m_caratPosition;
-	string defaultFilePath = "C:/Temp/";
-	string defaultFileExtension = ".txt";
 public:
 	Document();
-	Document(
-		string text,
-		vector<string> fonts,
-		vector<Color> colors,
-		vector<int> sizes,
-		string name,
-		int caratPosition
-	);
 	~Document();
-	void setText(string text);
-	void insertText(string text, int insertIndex);
-	void removeText(int startIndex, int endIndex);
-	string getText();
-	void setFont(vector<string> fonts);
-	void changeFont(string font, int startIndex, int endIndex);
-	void insertFont(string font, int index);
-	void removeFont(int startIndex, int endIndex);
-	string getFont(int index);
-	void setColor(vector<Color> colors);
-	void changeColor(Color color, int startIndex, int endIndex);
-	void insertColor(Color color, int index);
-	void removeColor(int startIndex, int endIndex);
-	Color getColor(int index);
-	void setSize(vector<int> sizes);
-	void changeSize(int size, int startIndex, int endIndex);
-	void insertSize(int size, int index);
-	void removeSize(int startIndex, int endIndex);
-	int getSize(int index);
-	void setName(string name);
-	string getName();
-	void setCaratPosition(int position);
-	int getCaratPosition();
-	void save();
+	
+	string& GetText();
+	size_t GetLength();
+
+	void InsertText(string text, uint32_t index);
+	void RemoveText(uint32_t index, size_t size);
+	void SetName(string name);
+	string GetName();
+
+	void SetCaratPosition(uint32_t position);
+	uint32_t GetCaratPosition();
+
+	void SetSelectionStart(uint32_t position);
+	uint32_t GetSelectionStart();
+
+	string GetFontAt(uint32_t index);
+	uint32_t GetSizeAt(uint32_t index);
+	Color GetColorAt(uint32_t index);
+
+	vector<Style<string>> & GetFonts();
+	vector<Style<Color>> & GetColors();
+	vector<Style<size_t>> & GetSizes();
+
+	void Save();
+private:
+	template<typename DataType>
+	void SetStyle(vector<Style<DataType>>& styles, uint32_t start, Style<DataType>&& style);
+
+	// Returns the starting style index where changes took place
+	template<typename DataType>
+	uint32_t RemoveStyle(vector<Style<DataType>>& styles, uint32_t start, size_t size);
+
+	template<typename DataType>
+	void ExtendStyle(vector<Style<DataType>>& styles, uint32_t start, size_t size);
+
+	template<typename DataType>
+	DataType GetStyle(vector<Style<DataType>>& styles, uint32_t index);
+private:
+	string m_text;
+
+	string m_defaultFont;
+	Color m_defaultColor;
+	size_t m_defaultSize;
+
+	vector<Style<string>> m_fonts;
+	vector<Style<Color>> m_colors;
+	vector<Style<size_t>> m_sizes;
+	
+	string m_name;
+	uint32_t m_caratPosition;
+	uint32_t m_selectionStart;
+	string m_defaultFilePath = "C:/Temp/";
+	string m_defaultFileExtension = ".txt";
 };
 
+template<typename DataType>
+inline void Document::SetStyle(vector<Style<DataType>>& styles, uint32_t start, Style<DataType>&& style)
+{
+	uint32_t insertionIndex = RemoveStyle(styles, start, style.Size);
+	// Insert the new style
+	if (insertionIndex == styles.size() || styles.size() == 0) {
+		styles.push_back(style);
+	}
+	else {
+		styles.insert(styles.begin() + insertionIndex, style);
+	}
+}
+
+template<typename DataType>
+inline uint32_t Document::RemoveStyle(vector<Style<DataType>>& styles, uint32_t start, size_t size)
+{
+	uint32_t end = start + size - 1; // Minus 1 to be inclusive of the end
+	uint32_t i = 0;
+	uint32_t currentStart = 0;
+	while (i < styles.size()) {
+		Style<DataType> currentStyle = styles[i];
+		uint32_t currentEnd = currentStart + currentStyle.Size - 1; // Minus 1 to be inclusive of the end
+		// If an intersection exists, handle one of the 4 cases
+		if (currentStart <= currentEnd && currentStart <= end) {
+			// The new style overlaps the end of the current style
+			if (end >= currentEnd) {
+				currentStyle.Size = start - currentStart;
+				styles[i] = currentStyle;
+				i++;
+			}
+			// The new style overlaps the start of the current style
+			else if (start <= currentStart) {
+				currentStyle.Size = currentEnd - end;
+				styles[i] = currentStyle;
+				break;
+			}
+			// The new style completely overlaps the current style
+			else if (start <= currentStart && end >= currentEnd) {
+				styles.erase(styles.begin() + i);
+			}
+			// The new style is inserted into the middle of the current style
+			else if (currentStart < start && currentEnd > end) {
+				currentStyle.Size = start - currentStart;
+				styles[i] = currentStyle;
+				i++;
+				// Split the current style into two, and insert the second one right after the first
+				currentStyle.Size = currentEnd - end;
+				styles.insert(styles.begin() + i, currentStyle);
+
+				break;
+			}
+		}
+		currentStart += currentStyle.Size;
+	}
+	return i;
+}
+
+template<typename DataType>
+inline void Document::ExtendStyle(vector<Style<DataType>>& styles, uint32_t start, size_t size)
+{
+	// Push current styles back to accomodate the new style
+	uint32_t currentStart = 0;
+	int styleIndex = 0;
+	for (auto& currentStyle : styles) {
+		uint32_t currentEnd = currentStart + currentStyle.Size - 1;
+		if (start >= currentStart && start <= currentEnd || styleIndex == styles.size() - 1) {
+			currentStyle.Size += size;
+			break;
+		}
+		styleIndex++;
+	}
+}
+
+template<typename DataType>
+inline DataType Document::GetStyle(vector<Style<DataType>>& styles, uint32_t index)
+{
+	uint32_t currentStart = 0;
+	for (auto& style : styles) {
+		uint32_t currentEnd = currentStart + style.Size - 1;
+		if (index >= currentStart && index <= currentEnd) {
+			return style.Data;
+		}
+	}
+	// This should never be reached
+	return DataType();
+}

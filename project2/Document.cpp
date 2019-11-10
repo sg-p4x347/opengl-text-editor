@@ -1,158 +1,114 @@
 #include "pch.h"
 #include "Document.h"
 
-Document::Document()
-{
-	setName("document");
-	setCaratPosition(0);
-}
+Document::Document() : 
+	m_name("document"),
+	m_caratPosition(0),
+	m_selectionStart(0),
 
-Document::Document(string text, vector<string> fonts, vector<Color> colors, vector<int> sizes, string name, int caratPosition)
+	m_defaultFont("times"),
+	m_defaultSize(12),
+	m_defaultColor(0,0,0,1),
+
+	m_fonts {Style<string>(0, m_defaultFont)},
+	m_sizes {Style<size_t>(0, m_defaultSize)},
+	m_colors {Style<Color>(0, m_defaultColor)}
 {
-	setText(text);
-	setFont(fonts);
-	setColor(colors);
-	setSize(sizes);
-	setName("CopyOf" + name);
-	setCaratPosition(caratPosition);
 }
 
 Document::~Document()
 {
 }
-
-void Document::setText(string text)
-{
-	m_text = text;
-}
-
-void Document::insertText(string text, int insertIndex)
-{
-	m_text.insert(insertIndex, text);
-}
-
-void Document::removeText(int startIndex, int endIndex)
-{
-	m_text.erase(startIndex, endIndex);
-}
-
-string Document::getText()
+string& Document::GetText()
 {
 	return m_text;
 }
-
-void Document::setFont(vector<string> fonts)
+size_t Document::GetLength()
 {
-	m_fonts = fonts;
+	return m_text.length();
 }
-
-void Document::changeFont(string font, int startIndex, int endIndex)
+void Document::InsertText(string text, uint32_t index)
 {
-	for (int index = startIndex; index <= endIndex; ++index)
-	{
-		m_fonts[index] = font;
-	}
+	// Extend the current styles at the insertion location
+	ExtendStyle(m_fonts, index, text.length());
+	ExtendStyle(m_sizes, index, text.length());
+	ExtendStyle(m_colors, index, text.length());
+	// Insert the text into the entire document string
+	m_text.insert(index, text);
 }
-
-void Document::insertFont(string font, int index)
+void Document::RemoveText(uint32_t index, size_t size)
 {
-	// Not implemented
-	assert(false);
+	// Remove the current styles for this interval
+	RemoveStyle(m_fonts, index, size);
+	RemoveStyle(m_sizes, index, size);
+	RemoveStyle(m_colors, index, size);
+	// Remove the interval from the document string
+	m_text.erase(index, size);
 }
-
-void Document::removeFont(int startIndex, int endIndex)
-{
-	m_fonts.erase(m_fonts.begin() + startIndex, m_fonts.begin() + endIndex);
-}
-
-string Document::getFont(int index)
-{
-	return m_fonts[index];
-}
-
-void Document::setColor(vector<Color> colors)
-{
-	m_colors = colors;
-}
-
-void Document::changeColor(Color color, int startIndex, int endIndex)
-{
-	for (int index = startIndex; index <= endIndex; ++index)
-	{
-		m_colors[index] = color;
-	}
-}
-
-void Document::insertColor(Color color, int index)
-{
-	// Not implemented
-	assert(false);
-}
-
-void Document::removeColor(int startIndex, int endIndex)
-{
-	m_colors.erase(m_colors.begin() + startIndex, m_colors.begin() + endIndex);
-}
-
-Color Document::getColor(int index)
-{
-	return m_colors[index];
-}
-
-void Document::setSize(vector<int> sizes)
-{
-	m_sizes = sizes;
-}
-
-void Document::changeSize(int size, int startIndex, int endIndex)
-{
-	for (int index = startIndex; index <= endIndex; ++index)
-	{
-		m_sizes[index] = size;
-	}
-}
-
-void Document::insertSize(int size, int index)
-{
-	// Not implemented
-	assert(false);
-}
-
-void Document::removeSize(int startIndex, int endIndex)
-{
-	m_sizes.erase(m_sizes.begin() + startIndex, m_sizes.begin() + endIndex);
-}
-
-int Document::getSize(int index)
-{
-	return m_sizes[index];
-}
-
-void Document::setName(string name)
+void Document::SetName(string name)
 {
 	m_name = name;
 }
 
-string Document::getName()
+string Document::GetName()
 {
 	return m_name;
 }
 
-void Document::setCaratPosition(int position)
+void Document::SetCaratPosition(uint32_t position)
 {
 	m_caratPosition = position;
 }
 
-int Document::getCaratPosition()
+uint32_t Document::GetCaratPosition()
 {
 	return m_caratPosition;
 }
 
+void Document::SetSelectionStart(uint32_t position)
+{
+	m_selectionStart = position;
+}
 
-void Document::save()
+uint32_t Document::GetSelectionStart()
+{
+	return m_selectionStart;
+}
+
+string Document::GetFontAt(uint32_t index)
+{
+	return GetStyle(m_fonts, index);
+}
+
+uint32_t Document::GetSizeAt(uint32_t index)
+{
+	return GetStyle(m_sizes, index);
+}
+
+Color Document::GetColorAt(uint32_t index)
+{
+	return GetStyle(m_colors, index);
+}
+
+vector<Style<string>> & Document::GetFonts()
+{
+	return m_fonts;
+}
+
+vector<Style<Color>> & Document::GetColors()
+{
+	return m_colors;
+}
+
+vector<Style<size_t>> & Document::GetSizes()
+{
+	return m_sizes;
+}
+
+void Document::Save()
 {
 	ofstream outFile;
-	outFile.open(defaultFilePath + getName() + defaultFileExtension);
-	outFile << getText();
+	outFile.open(m_defaultFilePath + GetName() + m_defaultFileExtension);
+	outFile << m_text;
 	outFile.close();
 }

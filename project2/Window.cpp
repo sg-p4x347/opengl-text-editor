@@ -26,10 +26,13 @@ Window::Window(
 	// specify a viewing area
 	gluOrtho2D(left, right, bottom, top);
 	// Register callbacks
-	glutDisplayFunc(Window::Render);
-	glutIdleFunc(Window::Idle);
-	glutMouseFunc(Window::MouseFunc);
-	glutKeyboardFunc(Window::KeyboardFunc);
+	glutDisplayFunc(Window::DisplayFuncDispatcher);
+	glutIdleFunc(Window::IdleFuncDispatcher);
+	glutMouseFunc(Window::MouseFuncDispatcher);
+	glutKeyboardFunc(Window::KeyboardFuncDispatcher);
+	glutKeyboardUpFunc(Window::KeyboardUpFuncDispatcher);
+	glutSpecialFunc(Window::SpecialFuncDispatcher);
+	glutSpecialUpFunc(Window::SpecialUpFuncDispatcher);
 	// Initialize rendering configurations
 	glutInitDisplayMode(GLUT_ALPHA);
 	glClearColor(1.f, 1.f, 1.f, 1.f);
@@ -76,48 +79,79 @@ Vector2 Window::ScreenToWorld(Vector2 screen)
 	);
 }
 
-void Window::SetRender(std::function<void()>&& render)
-{
-	m_render = render;
-}
 
-void Window::SetIdle(std::function<void()>&& idle)
-{
-	m_idle = idle;
-}
-
-void Window::SetMouseFunc(std::function<void(int, int, int, int)>&& mouseFunc)
-{
-	m_mouseFunc = mouseFunc;
-}
-
-void Window::SetKeyboardFunc(std::function<void(unsigned char, int, int)>&& keyboardFunc)
-{
-	m_keyboardFunc = keyboardFunc;
-}
-
-void Window::Render()
+void Window::DisplayFuncDispatcher()
 {
 	if (g_windows.count(glutGetWindow()))
-		g_windows[glutGetWindow()]->m_render();
+		g_windows[glutGetWindow()]->DisplayFunc();
 }
 
-void Window::Idle()
+void Window::IdleFuncDispatcher()
 {
-	/*if (g_windows.count(glutGetWindow()))
-		g_windows[glutGetWindow()]->m_idle();*/
+	if (g_windows.count(glutGetWindow()))
+		g_windows[glutGetWindow()]->IdleFunc();
+}
+
+void Window::MouseFuncDispatcher(int button, int state, int x, int y)
+{
+	if (g_windows.count(glutGetWindow()))
+		g_windows[glutGetWindow()]->MouseFunc(button, state, x, y);
+}
+
+void Window::KeyboardFuncDispatcher(unsigned char key, int x, int y)
+{
+	if (g_windows.count(glutGetWindow()))
+		g_windows[glutGetWindow()]->KeyboardFunc(key, x, y);
+}
+
+void Window::KeyboardUpFuncDispatcher(unsigned char key, int x, int y)
+{
+	if (g_windows.count(glutGetWindow()))
+		g_windows[glutGetWindow()]->KeyboardUpFunc(key, x, y);
+}
+
+void Window::SpecialFuncDispatcher(int key, int x, int y)
+{
+	if (g_windows.count(glutGetWindow()))
+		g_windows[glutGetWindow()]->SpecialFunc(key, x, y);
+}
+
+void Window::SpecialUpFuncDispatcher(int key, int x, int y)
+{
+	if (g_windows.count(glutGetWindow()))
+		g_windows[glutGetWindow()]->SpecialUpFunc(key, x, y);
+}
+
+void Window::DisplayFunc()
+{
+}
+
+void Window::IdleFunc()
+{
 }
 
 void Window::MouseFunc(int button, int state, int x, int y)
 {
-	if (g_windows.count(glutGetWindow()))
-		g_windows[glutGetWindow()]->m_mouseFunc(button, state, x, y);
 }
 
 void Window::KeyboardFunc(unsigned char key, int x, int y)
 {
-	if (g_windows.count(glutGetWindow()))
-		g_windows[glutGetWindow()]->m_keyboardFunc(key, x, y);
+	m_keys[key] = true;
+}
+
+void Window::KeyboardUpFunc(unsigned char key, int x, int y)
+{
+	m_keys[key] = false;
+}
+
+void Window::SpecialFunc(int key, int x, int y)
+{
+	m_specialKeys[key] = true;
+}
+
+void Window::SpecialUpFunc(int key, int x, int y)
+{
+	m_specialKeys[key] = false;
 }
 
 shared_ptr<Window> Window::Create(shared_ptr<Window> window)

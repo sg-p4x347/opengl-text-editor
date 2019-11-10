@@ -7,5 +7,7 @@ struct Vector2
 	Vector2(float xIn, float yIn) : x(xIn), y(yIn) {}
 	float x;
 	float y;
+
+	Vector2 operator-(const Vector2& right);
 };
 

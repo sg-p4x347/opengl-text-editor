@@ -4,10 +4,12 @@
 class TextEditor
 {
 private:
-	vector<Document> documents;
-	Document* m_active;
+	vector<shared_ptr<Document>> m_documents;
+	shared_ptr<Document> m_active;
 public:
 	TextEditor();
-	vector<string> getTabNames();
+	shared_ptr<Document> GetActiveDocument();
+	vector<shared_ptr<Document>> GetDocuments();
+	void NewDocument();
 };
 

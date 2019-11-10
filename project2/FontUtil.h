@@ -11,7 +11,7 @@
 class FontUtil
 {
 public:
-	static void Render(
+	static void DisplayFuncDispatcher(
 		// Target window to render to
 		Window& window, 
 		// The screen position in pixels of the bottom left corner of the text
@@ -26,7 +26,7 @@ public:
 		Color color
 	);
 	// Returns the index within the string that is closest to the pixel offset given
-	static int NearestCharacterIndex(
+	static uint32_t NearestCharacterIndex(
 		// The text to measure
 		string text,
 		// The font to use
@@ -50,6 +50,7 @@ private:
 	// Statics
 	static FontUtil& Get();
 	static const path m_fontDirectory;
+	static const int m_tabSizeInSpaces;
 	static FT_Error FaceRequester(FTC_FaceID faceId, FT_Library library, FT_Pointer requestData, FT_Face* fontFace);
 	static void LogError(FT_Error& error);
 private:
