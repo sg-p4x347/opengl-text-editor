@@ -110,7 +110,7 @@ namespace ote {
 			size_t carriageReturnOffset = 0;
 			if (word.Text[0] == '\r')
 				carriageReturnOffset = 1;
-			uint32_t index = std::min(FontUtil::NearestCharacterIndex(word.Text, word.Font, word.Size, windowWidth - x, true), word.Text.find('\r', carriageReturnOffset));
+			uint32_t index = std::min(FontUtil::NearestCharacterIndex(word.Text, word.Font, word.Size, windowWidth - x, true), (uint32_t)word.Text.find('\r', carriageReturnOffset));
 			if (carriageReturnOffset <= index && index < word.Text.length() || x >= windowWidth) {
 				if (index < word.Text.length()) {
 					// Split this word and recursively render each part on separate lines
@@ -155,7 +155,7 @@ namespace ote {
 			FontUtil::Render(*this, pen, word.Text, word.Font, word.Size, word.Colour);
 
 			uint32_t highlightStart = std::max(std::min(carat, selectionStart), charIndex);
-			uint32_t highlightEnd = std::min(std::max(carat, selectionStart), charIndex + word.Text.length());
+			uint32_t highlightEnd = std::min(std::max(carat, selectionStart), charIndex + (uint32_t)word.Text.length());
 			if (highlightStart < highlightEnd) {
 				string highlightedText = word.Text.substr(highlightStart - charIndex, highlightEnd - highlightStart);
 				FillRect(
@@ -198,7 +198,7 @@ namespace ote {
 	void TextEditorWindow::MoveCarat(Document& document, uint32_t position, bool disableSelect, bool selectionOverride)
 	{
 		// Clamp the position to valid values
-		position = std::max(0u, std::min(document.GetLength(), position));
+		position = std::max(0u, std::min((uint32_t)document.GetLength(), position));
 
 		document.SetCaratPosition(position);
 		if (disableSelect || selectionOverride && !(glutGetModifiers() & GLUT_ACTIVE_SHIFT)) {
@@ -228,6 +228,10 @@ void TextEditorWindow::InitMenu()
 	m_fontMenuID = glutCreateMenu(FontMenuCallback);
 
 	m_sizeMenuID = glutCreateMenu(SizeMenuCallback);
+	for (int size = 8; size <= 14; ++size)
+	{
+		glutAddMenuEntry(std::to_string(size).c_str(), size);
+	}
 
 	m_colorMenuID = glutCreateMenu(ColorMenuCallback);
 
@@ -235,6 +239,7 @@ void TextEditorWindow::InitMenu()
 	glutAddSubMenu("Change Active Font", m_fontMenuID);
 	glutAddSubMenu("Change Active Size", m_sizeMenuID);
 	glutAddSubMenu("Change Active Color", m_colorMenuID);
+	glutAddMenuEntry("Save Current Text", 0);
 	glutAddMenuEntry("Exit", -1);
 
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
@@ -242,10 +247,10 @@ void TextEditorWindow::InitMenu()
 
 void TextEditorWindow::MainMenuCallback(int entryID)
 {
-	switch (entryID)
+	if (g_windows.count(glutGetWindow()))
 	{
-	case -1:
-		exit(0);
+		TextEditorWindow* tw = (TextEditorWindow*)g_windows[glutGetWindow()].get();
+		tw->MainMenuDispatcher(entryID);
 	}
 }
 
@@ -260,7 +265,7 @@ void TextEditorWindow::SizeMenuCallback(int entryID)
 {
 	switch (entryID)
 	{
-
+		
 	}
 }
 
@@ -269,6 +274,26 @@ void TextEditorWindow::ColorMenuCallback(int entryID)
 	switch (entryID) {
 
 	}
+}
+
+void TextEditorWindow::MainMenuDispatcher(int entryID)
+{
+	TextEditorWindow* tw = (TextEditorWindow*)g_windows[glutGetWindow()].get();
+	TextEditor* te = tw->getTextEditor();
+	Document* ad = te->GetActiveDocument().get();
+
+	switch (entryID)
+	{
+	case 0:
+		ad->Save();
+	case -1:
+		exit(0);
+	}
+}
+
+TextEditor* TextEditorWindow::getTextEditor()
+{
+	return &m_textEditor;
 }
 
 
@@ -372,7 +397,7 @@ void TextEditorWindow::ColorMenuCallback(int entryID)
 				DisplayFunc();
 				break;
 			case GLUT_KEY_RIGHT:
-				MoveCarat(document, std::min(document.GetLength(), document.GetCaratPosition() + 1));
+				MoveCarat(document, std::min((uint32_t)document.GetLength(), (uint32_t)document.GetCaratPosition() + 1));
 				DisplayFunc();
 				break;
 			case GLUT_KEY_UP:
