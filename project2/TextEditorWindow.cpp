@@ -229,7 +229,9 @@ namespace ote {
 void TextEditorWindow::InitMenu()
 {
 	m_fontMenuID = glutCreateMenu(TextEditorWindow::FontMenuDispatcher);
-
+	glutAddMenuEntry("Arial", 0);
+	glutAddMenuEntry("Times New Roman", 1);
+	glutAddMenuEntry("Impact", 2);
 	m_sizeMenuID = glutCreateMenu(TextEditorWindow::SizeMenuDispatcher);
 	for (int size = 8; size <= 14; ++size)
 	{
@@ -237,9 +239,13 @@ void TextEditorWindow::InitMenu()
 	}
 
 	m_colorMenuID = glutCreateMenu(TextEditorWindow::ColorMenuDispatcher);
-
+	glutAddMenuEntry("Black", 0);
+	glutAddMenuEntry("Red", 1);
+	glutAddMenuEntry("Green", 2);
+	glutAddMenuEntry("Blue", 3);
 	m_mainMenuID = glutCreateMenu(TextEditorWindow::MainMenuDispatcher);
 	glutAddSubMenu("Change Active Font", m_fontMenuID);
+	
 	glutAddSubMenu("Change Active Size", m_sizeMenuID);
 	glutAddSubMenu("Change Active Color", m_colorMenuID);
 	glutAddMenuEntry("Save Current Text", 0);
@@ -248,50 +254,51 @@ void TextEditorWindow::InitMenu()
 		glutAttachMenu(GLUT_RIGHT_BUTTON);
 	}
 
-void TextEditorWindow::MainMenuFunc(int entryID)
-{
-	if (g_windows.count(glutGetWindow()))
+	void TextEditorWindow::MainMenuFunc(int entryID)
 	{
-		TextEditorWindow* tw = (TextEditorWindow*)g_windows[glutGetWindow()].get();
-		tw->MainMenuDispatcher(entryID);
-	}
-}
-
-void TextEditorWindow::FontMenuFunc(int entryID)
-{
-	switch (entryID) {
-
-		}
-	}
-
-void TextEditorWindow::SizeMenuFunc(int entryID)
-{
-	switch (entryID)
-	{
-		
-		}
-	}
-
-void TextEditorWindow::ColorMenuFunc(int entryID)
-{
-	switch (entryID) {
-
-		}
-	}
-
-	void TextEditorWindow::MainMenuDispatcher(int entryID)
-	{
-		TextEditorWindow* tw = (TextEditorWindow*)g_windows[glutGetWindow()].get();
-		TextEditor* te = tw->getTextEditor();
-		Document* ad = te->GetActiveDocument().get();
+		Document& document = *m_textEditor.GetActiveDocument();
 
 		switch (entryID)
 		{
 		case 0:
-			ad->Save();
+			document.Save();
 		case -1:
 			exit(0);
 		}
+	}
+
+	void TextEditorWindow::FontMenuFunc(int entryID)
+	{
+		Document& document = *m_textEditor.GetActiveDocument();
+		switch (entryID) {
+		case 0: document.SetFont("arial"); break;
+		case 1: document.SetFont("times"); break;
+		case 2: document.SetFont("impact"); break;
+		}
+		UpdateWords();
+		DisplayFunc();
+	}
+
+	void TextEditorWindow::SizeMenuFunc(int entryID)
+	{
+		Document& document = *m_textEditor.GetActiveDocument();
+		document.SetSize(entryID);
+		UpdateWords();
+		DisplayFunc();
+	}
+
+	void TextEditorWindow::ColorMenuFunc(int entryID)
+	{
+		Document& document = *m_textEditor.GetActiveDocument();
+		switch (entryID) {
+		case 0: document.SetColor(Color(0, 0, 0)); break;
+		case 1: document.SetColor(Color(1, 0, 0)); break;
+		case 2: document.SetColor(Color(0, 1, 0)); break;
+		case 3: document.SetColor(Color(0, 0, 1)); break;
+		}
+
+		UpdateWords();
+		DisplayFunc();
 	}
 
 	TextEditor* TextEditorWindow::getTextEditor()

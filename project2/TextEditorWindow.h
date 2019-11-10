@@ -51,11 +51,6 @@ namespace ote {
 		virtual void SizeMenuFunc(int entryID) override;
 		virtual void ColorMenuFunc(int entryID) override;
 
-		static void MainMenuDispatcher(int entryID);
-		static void FontMenuDispatcher(int entryID);
-		static void SizeMenuDispatcher(int entryID);
-		static void ColorMenuDispatcher(int entryID);
-
 		TextEditor* getTextEditor();
 	};
 }

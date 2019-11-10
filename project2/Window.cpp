@@ -141,18 +141,26 @@ void Window::TimerFuncDispatcher(int value)
 
 void Window::MainMenuDispatcher(int entryID)
 {
+	if (g_windows.count(glutGetWindow()))
+		g_windows[glutGetWindow()]->MainMenuFunc(entryID);
 }
 
 void Window::FontMenuDispatcher(int entryID)
 {
+	if (g_windows.count(glutGetWindow()))
+		g_windows[glutGetWindow()]->FontMenuFunc(entryID);
 }
 
 void Window::SizeMenuDispatcher(int entryID)
 {
+	if (g_windows.count(glutGetWindow()))
+		g_windows[glutGetWindow()]->SizeMenuFunc(entryID);
 }
 
 void Window::ColorMenuDispatcher(int entryID)
 {
+	if (g_windows.count(glutGetWindow()))
+		g_windows[glutGetWindow()]->ColorMenuFunc(entryID);
 }
 
 void Window::DisplayFunc()
