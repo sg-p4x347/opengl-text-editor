@@ -18,6 +18,18 @@ namespace ote {
 		UpdateWords();
 	}
 
+	vector<string> TextEditorWindow::getFonts()
+	{
+		vector<string> result = FontUtil::ListFonts();
+		return result;
+		//return &FontUtil::ListFonts();
+	}
+
+	string TextEditorWindow::getFonts(int index)
+	{
+		return FontUtil::ListFonts()[index];
+	}
+
 	int TextEditorWindow::MeasureText(string text, void* font, int fontSize)
 	{
 		return glutBitmapLength(font, (const unsigned char*)text.c_str());
@@ -229,11 +241,16 @@ namespace ote {
 void TextEditorWindow::InitMenu()
 {
 	m_fontMenuID = glutCreateMenu(TextEditorWindow::FontMenuDispatcher);
-	glutAddMenuEntry("Arial", 0);
+	vector<string> fontNames = TextEditorWindow::getFonts();
+	for (int index = 0; index < fontNames.size(); ++index)
+	{
+		glutAddMenuEntry(fontNames[index].c_str(), index);
+	}
+	/*glutAddMenuEntry("Arial", 0);
 	glutAddMenuEntry("Times New Roman", 1);
-	glutAddMenuEntry("Impact", 2);
+	glutAddMenuEntry("Impact", 2);*/
 	m_sizeMenuID = glutCreateMenu(TextEditorWindow::SizeMenuDispatcher);
-	for (int size = 8; size <= 14; ++size)
+	for (int size = 8; size <= 24; ++size)
 	{
 		glutAddMenuEntry(std::to_string(size).c_str(), size);
 	}
@@ -245,7 +262,6 @@ void TextEditorWindow::InitMenu()
 	glutAddMenuEntry("Blue", 3);
 	m_mainMenuID = glutCreateMenu(TextEditorWindow::MainMenuDispatcher);
 	glutAddSubMenu("Change Active Font", m_fontMenuID);
-	
 	glutAddSubMenu("Change Active Size", m_sizeMenuID);
 	glutAddSubMenu("Change Active Color", m_colorMenuID);
 	glutAddMenuEntry("Save Current Text", 0);
@@ -262,6 +278,7 @@ void TextEditorWindow::InitMenu()
 		{
 		case 0:
 			document.Save();
+			break;
 		case -1:
 			exit(0);
 		}
@@ -270,11 +287,12 @@ void TextEditorWindow::InitMenu()
 	void TextEditorWindow::FontMenuFunc(int entryID)
 	{
 		Document& document = *m_textEditor.GetActiveDocument();
-		switch (entryID) {
+		document.SetFont(TextEditorWindow::getFonts(entryID));
+		/*switch (entryID) {
 		case 0: document.SetFont("arial"); break;
 		case 1: document.SetFont("times"); break;
 		case 2: document.SetFont("impact"); break;
-		}
+		}*/
 		UpdateWords();
 		DisplayFunc();
 	}

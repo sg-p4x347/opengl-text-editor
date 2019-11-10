@@ -3,6 +3,7 @@
 #include "Font.h"
 #include "Bitmap.h"
 #include <GL/freeglut.h>
+#include <filesystem>
 #include FT_CACHE_H
 
 const path FontUtil::m_fontDirectory = "C:\\Windows\\Fonts";
@@ -190,5 +191,20 @@ size_t FontUtil::GetMaxSize()
 
 vector<string> FontUtil::ListFonts()
 {
-	return vector<string>();
+	vector<string> fontFamilyNames;
+	for (const auto& dirEntry : std::filesystem::directory_iterator(m_fontDirectory))
+		if (dirEntry.path().string()[dirEntry.path().string().size() - 1] == 'f') {
+			string temp = dirEntry.path().string();
+			temp.erase(0, m_fontDirectory.string().size() + 1);
+			temp.erase(temp.end() - 4, temp.end());
+			
+			auto faceId = Get().GetFaceID(temp);
+			FT_Face face;
+			FTC_Manager_LookupFace(Get().m_cacheManager, faceId, &face);
+
+			if (fontFamilyNames.size() == 0 || fontFamilyNames[fontFamilyNames.size() - 1] != face->family_name) {
+				fontFamilyNames.push_back(face->family_name);
+			}
+		}
+	return fontFamilyNames;
 }

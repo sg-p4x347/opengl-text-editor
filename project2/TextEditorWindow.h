@@ -10,6 +10,8 @@ namespace ote {
 	{
 	public:
 		TextEditorWindow();
+		static vector<string> getFonts();
+		static string getFonts(int index);
 		// Callbacks
 		virtual void DisplayFunc() override;
 		virtual void MouseFunc(int button, int state, int x, int y) override;
