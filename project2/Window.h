@@ -22,17 +22,20 @@ public:
 	void Hide();
 	Vector2 ScreenToWorld(Vector2 screen);
 	// Dispatchers
-	static void DisplayFuncDispatcher();
+	static void Render();
 	static void IdleFuncDispatcher();
 	static void MouseFuncDispatcher(int button, int state, int x, int y);
+	static void MotionFuncDispatcher(int x, int y);
 	static void KeyboardFuncDispatcher(unsigned char key, int x, int y);
 	static void KeyboardUpFuncDispatcher(unsigned char key, int x, int y);
 	static void SpecialFuncDispatcher(int key, int x, int y);
 	static void SpecialUpFuncDispatcher(int key, int x, int y);
+
 	// Virtual callbacks
 	virtual void DisplayFunc();
 	virtual void IdleFunc();
 	virtual void MouseFunc(int button, int state, int x, int y);
+	virtual void MotionFunc(int x, int y);
 	virtual void KeyboardFunc(unsigned char key, int x, int y);
 	virtual void KeyboardUpFunc(unsigned char key, int x, int y);
 	virtual void SpecialFunc(int key, int x, int y);

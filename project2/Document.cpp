@@ -8,11 +8,7 @@ Document::Document() :
 
 	m_defaultFont("times"),
 	m_defaultSize(12),
-	m_defaultColor(0,0,0,1),
-
-	m_fonts {Style<string>(0, m_defaultFont)},
-	m_sizes {Style<size_t>(0, m_defaultSize)},
-	m_colors {Style<Color>(0, m_defaultColor)}
+	m_defaultColor(0,0,0,1)
 {
 }
 
@@ -30,20 +26,34 @@ size_t Document::GetLength()
 void Document::InsertText(string text, uint32_t index)
 {
 	// Extend the current styles at the insertion location
-	ExtendStyle(m_fonts, index, text.length());
-	ExtendStyle(m_sizes, index, text.length());
-	ExtendStyle(m_colors, index, text.length());
+	ExtendStyle(m_fonts, index, text.length(), m_defaultFont);
+	ExtendStyle(m_sizes, index, text.length(), m_defaultSize);
+	ExtendStyle(m_colors, index, text.length(), m_defaultColor);
 	// Insert the text into the entire document string
 	m_text.insert(index, text);
 }
 void Document::RemoveText(uint32_t index, size_t size)
 {
-	// Remove the current styles for this interval
-	RemoveStyle(m_fonts, index, size);
-	RemoveStyle(m_sizes, index, size);
-	RemoveStyle(m_colors, index, size);
-	// Remove the interval from the document string
-	m_text.erase(index, size);
+	if (size > 0) {
+		// Remove the current styles for this interval
+		RemoveStyle(m_fonts, index, size);
+		RemoveStyle(m_sizes, index, size);
+		RemoveStyle(m_colors, index, size);
+		// Remove the interval from the document string
+		m_text.erase(index, size);
+	}
+}
+void Document::SetFont(string font, uint32_t start, uint32_t size)
+{
+	SetStyle(m_fonts, start, Style<string>(size, font));
+}
+void Document::SetSize(size_t fontSize, uint32_t start, uint32_t size)
+{
+	SetStyle(m_sizes, start, Style<size_t>(size, fontSize));
+}
+void Document::SetColor(Color color, uint32_t start, uint32_t size)
+{
+	SetStyle(m_colors, start, Style<Color>(size, color));
 }
 void Document::SetName(string name)
 {

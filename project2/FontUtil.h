@@ -11,7 +11,7 @@
 class FontUtil
 {
 public:
-	static void DisplayFuncDispatcher(
+	static void Render(
 		// Target window to render to
 		Window& window, 
 		// The screen position in pixels of the bottom left corner of the text

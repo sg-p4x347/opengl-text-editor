@@ -26,9 +26,10 @@ Window::Window(
 	// specify a viewing area
 	gluOrtho2D(left, right, bottom, top);
 	// Register callbacks
-	glutDisplayFunc(Window::DisplayFuncDispatcher);
+	glutDisplayFunc(Window::Render);
 	glutIdleFunc(Window::IdleFuncDispatcher);
 	glutMouseFunc(Window::MouseFuncDispatcher);
+	glutMotionFunc(Window::MotionFuncDispatcher);
 	glutKeyboardFunc(Window::KeyboardFuncDispatcher);
 	glutKeyboardUpFunc(Window::KeyboardUpFuncDispatcher);
 	glutSpecialFunc(Window::SpecialFuncDispatcher);
@@ -80,7 +81,7 @@ Vector2 Window::ScreenToWorld(Vector2 screen)
 }
 
 
-void Window::DisplayFuncDispatcher()
+void Window::Render()
 {
 	if (g_windows.count(glutGetWindow()))
 		g_windows[glutGetWindow()]->DisplayFunc();
@@ -96,6 +97,12 @@ void Window::MouseFuncDispatcher(int button, int state, int x, int y)
 {
 	if (g_windows.count(glutGetWindow()))
 		g_windows[glutGetWindow()]->MouseFunc(button, state, x, y);
+}
+
+void Window::MotionFuncDispatcher(int x, int y)
+{
+	if (g_windows.count(glutGetWindow()))
+		g_windows[glutGetWindow()]->MotionFunc(x, y);
 }
 
 void Window::KeyboardFuncDispatcher(unsigned char key, int x, int y)
@@ -131,6 +138,10 @@ void Window::IdleFunc()
 }
 
 void Window::MouseFunc(int button, int state, int x, int y)
+{
+}
+
+void Window::MotionFunc(int x, int y)
 {
 }
 

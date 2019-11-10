@@ -75,7 +75,7 @@ void FontUtil::LogError(FT_Error& error)
 	}
 }
 
-void FontUtil::DisplayFuncDispatcher(Window& window, Vector2 position, string text, string font, int size, Color color)
+void FontUtil::Render(Window& window, Vector2 position, string text, string font, int size, Color color)
 {
 	auto faceId = Get().GetFaceID(font);
 	FT_Face face;
@@ -105,9 +105,11 @@ void FontUtil::DisplayFuncDispatcher(Window& window, Vector2 position, string te
 			};
 
 			error = FTC_ImageCache_LookupScaler(Get().m_imageCache, &scaler, FT_LOAD_DEFAULT, glyph_index, &glyph, &node);
-
+			error = FT_Set_Pixel_Sizes(face, 0, size);
+			LogError(error);
 			error = FT_Load_Glyph(face, glyph_index, FT_LOAD_DEFAULT);
 			LogError(error);
+			
 			/* convert to an anti-aliased bitmap */
 			error = FT_Render_Glyph(slot, FT_RENDER_MODE_NORMAL);
 			LogError(error);
@@ -148,37 +150,49 @@ uint32_t FontUtil::NearestCharacterIndex(string text, string font, int size, int
 
 	for (char& ch : text)
 	{
+		if (ch != '\r') {
+			bool tab = false;
+			if (ch == '\t') {
+				tab = true;
+				ch = ' ';
+			}
+			//* retrieve glyph index from character code */
+			FT_UInt glyph_index = FT_Get_Char_Index(face, ch);
 
-		//* retrieve glyph index from character code */
-		FT_UInt glyph_index = FT_Get_Char_Index(face, ch);
+			FT_Glyph glyph;
+			FTC_Node node;
+			FTC_ScalerRec scaler{
+				faceId,
+				0,
+				size,
+				1,
+				0,
+				0
+			};
 
-		FT_Glyph glyph;
-		FTC_Node node;
-		FTC_ScalerRec scaler{
-			faceId,
-			0,
-			size,
-			1,
-			0,
-			0
-		};
+			error = FTC_ImageCache_LookupScaler(Get().m_imageCache, &scaler, FT_LOAD_DEFAULT, glyph_index, &glyph, &node);
+			error = FT_Set_Pixel_Sizes(face, 0, size);
+			error = FT_Load_Glyph(face, glyph_index, FT_LOAD_DEFAULT);
+			LogError(error);
+			/* convert to an anti-aliased bitmap */
+			error = FT_Render_Glyph(slot, FT_RENDER_MODE_NORMAL);
+			LogError(error);
 
-		error = FTC_ImageCache_LookupScaler(Get().m_imageCache, &scaler, FT_LOAD_DEFAULT, glyph_index, &glyph, &node);
+			int lastCursorPos = cursorPos;
+			int lastCursorIndex = cursorIndex;
 
-		error = FT_Load_Glyph(face, glyph_index, FT_LOAD_DEFAULT);
-		LogError(error);
-		/* convert to an anti-aliased bitmap */
-		error = FT_Render_Glyph(slot, FT_RENDER_MODE_NORMAL);
-		LogError(error);
+			if (!tab) {
+				cursorPos += slot->advance.x >> 6;
+			}
+			else {
+				cursorPos += (slot->advance.x >> 6)* m_tabSizeInSpaces;
+			}
+			cursorIndex++;
 
-		int lastCursorPos = cursorPos;
-		int lastCursorIndex = cursorIndex;
-
-		cursorPos += slot->advance.x >> 6;
-		cursorIndex++;
-
-		if (lastCursorPos <= offset && cursorPos >= offset) {
-			return (offset - lastCursorPos < cursorPos - offset) ? lastCursorIndex : cursorIndex;
+			if (lastCursorPos <= offset && cursorPos >= offset) {
+				return (offset - lastCursorPos < cursorPos - offset) ? lastCursorIndex : cursorIndex;
+			}
+			
 		}
 	}
 
@@ -217,7 +231,7 @@ int FontUtil::MeasureText(string text, string font, int size)
 			};
 
 			error = FTC_ImageCache_LookupScaler(Get().m_imageCache, &scaler, FT_LOAD_DEFAULT, glyph_index, &glyph, &node);
-
+			error = FT_Set_Pixel_Sizes(face, 0, size);
 			error = FT_Load_Glyph(face, glyph_index, FT_LOAD_DEFAULT);
 			LogError(error);
 			/* convert to an anti-aliased bitmap */

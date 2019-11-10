@@ -16,6 +16,11 @@ public:
 
 	void InsertText(string text, uint32_t index);
 	void RemoveText(uint32_t index, size_t size);
+
+	void SetFont(string font, uint32_t start, uint32_t size);
+	void SetSize(size_t fontSize, uint32_t start, uint32_t size);
+	void SetColor(Color color, uint32_t start, uint32_t size);
+
 	void SetName(string name);
 	string GetName();
 
@@ -43,7 +48,7 @@ private:
 	uint32_t RemoveStyle(vector<Style<DataType>>& styles, uint32_t start, size_t size);
 
 	template<typename DataType>
-	void ExtendStyle(vector<Style<DataType>>& styles, uint32_t start, size_t size);
+	void ExtendStyle(vector<Style<DataType>>& styles, uint32_t start, size_t size, DataType defaultValue);
 
 	template<typename DataType>
 	DataType GetStyle(vector<Style<DataType>>& styles, uint32_t index);
@@ -88,22 +93,14 @@ inline uint32_t Document::RemoveStyle(vector<Style<DataType>>& styles, uint32_t 
 		Style<DataType> currentStyle = styles[i];
 		uint32_t currentEnd = currentStart + currentStyle.Size - 1; // Minus 1 to be inclusive of the end
 		// If an intersection exists, handle one of the 4 cases
-		if (currentStart <= currentEnd && currentStart <= end) {
-			// The new style overlaps the end of the current style
-			if (end >= currentEnd) {
-				currentStyle.Size = start - currentStart;
-				styles[i] = currentStyle;
-				i++;
-			}
-			// The new style overlaps the start of the current style
-			else if (start <= currentStart) {
-				currentStyle.Size = currentEnd - end;
-				styles[i] = currentStyle;
-				break;
-			}
+		if (start <= currentEnd && currentStart <= end) {
+			
 			// The new style completely overlaps the current style
-			else if (start <= currentStart && end >= currentEnd) {
+			if (start <= currentStart && end >= currentEnd) {
 				styles.erase(styles.begin() + i);
+				if (end == currentEnd) {
+					break;
+				}
 			}
 			// The new style is inserted into the middle of the current style
 			else if (currentStart < start && currentEnd > end) {
@@ -116,6 +113,23 @@ inline uint32_t Document::RemoveStyle(vector<Style<DataType>>& styles, uint32_t 
 
 				break;
 			}
+			// The new style overlaps the end of the current style
+			else if (end >= currentEnd) {
+				currentStyle.Size = start - currentStart;
+				styles[i] = currentStyle;
+				i++;
+			}
+			// The new style overlaps the start of the current style
+			else if (start <= currentStart) {
+				currentStyle.Size = currentEnd - end;
+				styles[i] = currentStyle;
+				break;
+			}
+		
+
+		}
+		else {
+			i++;
 		}
 		currentStart += currentStyle.Size;
 	}
@@ -123,7 +137,7 @@ inline uint32_t Document::RemoveStyle(vector<Style<DataType>>& styles, uint32_t 
 }
 
 template<typename DataType>
-inline void Document::ExtendStyle(vector<Style<DataType>>& styles, uint32_t start, size_t size)
+inline void Document::ExtendStyle(vector<Style<DataType>>& styles, uint32_t start, size_t size, DataType defaultValue)
 {
 	// Push current styles back to accomodate the new style
 	uint32_t currentStart = 0;
@@ -132,10 +146,12 @@ inline void Document::ExtendStyle(vector<Style<DataType>>& styles, uint32_t star
 		uint32_t currentEnd = currentStart + currentStyle.Size - 1;
 		if (start >= currentStart && start <= currentEnd || styleIndex == styles.size() - 1) {
 			currentStyle.Size += size;
-			break;
+			return;
 		}
 		styleIndex++;
 	}
+	// Add default style
+	styles.push_back(Style<DataType>(size, defaultValue));
 }
 
 template<typename DataType>
@@ -147,6 +163,7 @@ inline DataType Document::GetStyle(vector<Style<DataType>>& styles, uint32_t ind
 		if (index >= currentStart && index <= currentEnd) {
 			return style.Data;
 		}
+		currentStart += style.Size;
 	}
 	// This should never be reached
 	return DataType();

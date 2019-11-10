@@ -36,15 +36,15 @@ int main(int argc, char ** argv) {
 
 	//	Vector2 position(100, 100);
 
-	//	FontUtil::DisplayFuncDispatcher(*helpWindow, position, "Hello World", "times", 12, Color());
+	//	FontUtil::Render(*helpWindow, position, "Hello World", "times", 12, Color());
 	//	// flush out the buffer contents
 	//	glFlush();
 
 	//});
 
 	// create a specialized text-editor window
-	auto textEditorWindow = Window::Create(std::make_shared<TextEditorWindow>());
-	glutTimerFunc(1000, TextEditorWindow::ToggleCarat, textEditorWindow->GetID());
+	auto textEditorWindow = Window::Create(std::make_shared<ote::TextEditorWindow>());
+	glutTimerFunc(1000, ote::TextEditorWindow::ToggleCarat, textEditorWindow->GetID());
 	glutMainLoop();
 	
 	return 0;
