@@ -18,16 +18,24 @@ namespace ote {
 		UpdateWords();
 	}
 
-	vector<string> TextEditorWindow::getFonts()
+	vector<string> TextEditorWindow::getFontFamilies()
 	{
-		vector<string> result = FontUtil::ListFonts();
-		return result;
-		//return &FontUtil::ListFonts();
+		return FontUtil::ListFonts()[0];
 	}
 
-	string TextEditorWindow::getFonts(int index)
+	string TextEditorWindow::getFontFamily(int index)
 	{
-		return FontUtil::ListFonts()[index];
+		return FontUtil::ListFonts()[0][index];
+	}
+
+	vector<string> TextEditorWindow::getFontFiles()
+	{
+		return FontUtil::ListFonts()[1];
+	}
+
+	string TextEditorWindow::getFontFile(int index)
+	{
+		return FontUtil::ListFonts()[1][index];
 	}
 
 	int TextEditorWindow::MeasureText(string text, void* font, int fontSize)
@@ -247,14 +255,11 @@ namespace ote {
 void TextEditorWindow::InitMenu()
 {
 	m_fontMenuID = glutCreateMenu(TextEditorWindow::FontMenuDispatcher);
-	vector<string> fontNames = TextEditorWindow::getFonts();
+	vector<string> fontNames = TextEditorWindow::getFontFamilies();
 	for (int index = 0; index < fontNames.size(); ++index)
 	{
 		glutAddMenuEntry(fontNames[index].c_str(), index);
 	}
-	/*glutAddMenuEntry("Arial", 0);
-	glutAddMenuEntry("Times New Roman", 1);
-	glutAddMenuEntry("Impact", 2);*/
 	m_sizeMenuID = glutCreateMenu(TextEditorWindow::SizeMenuDispatcher);
 	for (int size = 8; size <= 24; ++size)
 	{
@@ -293,12 +298,7 @@ void TextEditorWindow::InitMenu()
 	void TextEditorWindow::FontMenuFunc(int entryID)
 	{
 		Document& document = *m_textEditor.GetActiveDocument();
-		document.SetFont(TextEditorWindow::getFonts(entryID));
-		/*switch (entryID) {
-		case 0: document.SetFont("arial"); break;
-		case 1: document.SetFont("times"); break;
-		case 2: document.SetFont("impact"); break;
-		}*/
+		document.SetFont(TextEditorWindow::getFontFile(entryID));
 		UpdateWords();
 		DisplayFunc();
 	}

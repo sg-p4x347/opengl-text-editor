@@ -49,7 +49,7 @@ public:
 		int size
 	);
 	static size_t GetMaxSize();
-	static vector<string> ListFonts();
+	static vector<vector<string>> ListFonts();
 private:
 	// Statics
 	static FontUtil& Get();
