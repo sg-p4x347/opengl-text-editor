@@ -28,6 +28,7 @@ namespace ote {
 		size_t RowCharacterCount(vector<Word>& row);
 		int CalculateRowHeight(vector<Word>& row);
 		void RenderRow(vector<Word>& row, Vector2 pen, uint32_t& charIndex, Document& document);
+		void RenderCarat(Vector2 caratPos, size_t size);
 		void MoveCarat(Document& document, uint32_t position, bool disableSelect = false, bool selectionOverride = true);
 		void FillRect(Rectangle rect, Color color);
 		void GlVertex(Vector2 point);

@@ -9,7 +9,7 @@ namespace ote {
 		Window::Window("Text Editor", Vector2(), Vector2(400,400), 0.0, 1.0, 0.0, 1.0),
 		m_lineSpacing(12),
 		m_caratVisible(true),
-		m_editorPos(0.f,0.f)
+		m_editorPos(12.f,48.f)
 
 	{
 		m_textEditor.NewDocument();
@@ -30,7 +30,7 @@ namespace ote {
 		for (auto& word : m_words) {
 			words.push(word);
 		}
-		int rowBottom = 0;
+		int rowBottom = m_editorPos.y;
 		vector<Word> row;
 		uint32_t charIndex = 0;
 		while (screenPos.y > rowBottom) {
@@ -174,24 +174,27 @@ namespace ote {
 				Vector2 caratPos = pen;
 				if (carat == 0 && charIndex == 0 || carat > charIndex && carat <= charIndex + word.Text.length()) {
 
-					//if (carat < word.Text.length()) {
-						// Offset the carat within the word
-						caratPos.x += FontUtil::MeasureText(word.Text.substr(0, carat - charIndex), word.Font, word.Size);
-					//}
-
-					glLineWidth(2);
-					glColor3f(0, 0, 0);
-					glBegin(GL_LINES);
-
-					Vector2 start = ScreenToWorld(caratPos);
-					glVertex2f(start.x, start.y);
-					Vector2 end = ScreenToWorld(caratPos - Vector2(0, word.Size));
-					glVertex2f(end.x, end.y);
-					glEnd();
+					caratPos.x += FontUtil::MeasureText(word.Text.substr(0, carat - charIndex), word.Font, word.Size);
+					RenderCarat(caratPos, word.Size);
 				}
 			}
 			pen.x += FontUtil::MeasureText(word.Text, word.Font, word.Size);
 			charIndex += word.Text.length();
+		}
+	}
+
+	void TextEditorWindow::RenderCarat(Vector2 caratPos, size_t size)
+	{
+		if (m_caratVisible) {
+			glLineWidth(2);
+			glColor3f(0, 0, 0);
+			glBegin(GL_LINES);
+
+			Vector2 start = ScreenToWorld(caratPos);
+			glVertex2f(start.x, start.y);
+			Vector2 end = ScreenToWorld(caratPos - Vector2(0, size));
+			glVertex2f(end.x, end.y);
+			glEnd();
 		}
 	}
 
@@ -223,78 +226,78 @@ namespace ote {
 		glVertex2f(point.x, point.y);
 	}
 
-void TextEditorWindow::InitMenu()
-{
-	m_fontMenuID = glutCreateMenu(FontMenuCallback);
-
-	m_sizeMenuID = glutCreateMenu(SizeMenuCallback);
-	for (int size = 8; size <= 14; ++size)
+	void TextEditorWindow::InitMenu()
 	{
-		glutAddMenuEntry(std::to_string(size).c_str(), size);
+		m_fontMenuID = glutCreateMenu(FontMenuCallback);
+
+		m_sizeMenuID = glutCreateMenu(SizeMenuCallback);
+		for (int size = 8; size <= 14; ++size)
+		{
+			glutAddMenuEntry(std::to_string(size).c_str(), size);
+		}
+
+		m_colorMenuID = glutCreateMenu(ColorMenuCallback);
+
+		m_mainMenuID = glutCreateMenu(MainMenuCallback);
+		glutAddSubMenu("Change Active Font", m_fontMenuID);
+		glutAddSubMenu("Change Active Size", m_sizeMenuID);
+		glutAddSubMenu("Change Active Color", m_colorMenuID);
+		glutAddMenuEntry("Save Current Text", 0);
+		glutAddMenuEntry("Exit", -1);
+
+		glutAttachMenu(GLUT_RIGHT_BUTTON);
 	}
 
-	m_colorMenuID = glutCreateMenu(ColorMenuCallback);
+	void TextEditorWindow::MainMenuCallback(int entryID)
+	{
+		if (g_windows.count(glutGetWindow()))
+		{
+			TextEditorWindow* tw = (TextEditorWindow*)g_windows[glutGetWindow()].get();
+			tw->MainMenuDispatcher(entryID);
+		}
+	}
 
-	m_mainMenuID = glutCreateMenu(MainMenuCallback);
-	glutAddSubMenu("Change Active Font", m_fontMenuID);
-	glutAddSubMenu("Change Active Size", m_sizeMenuID);
-	glutAddSubMenu("Change Active Color", m_colorMenuID);
-	glutAddMenuEntry("Save Current Text", 0);
-	glutAddMenuEntry("Exit", -1);
+	void TextEditorWindow::FontMenuCallback(int entryID)
+	{
+		switch (entryID) {
 
-	glutAttachMenu(GLUT_RIGHT_BUTTON);
-}
+		}
+	}
 
-void TextEditorWindow::MainMenuCallback(int entryID)
-{
-	if (g_windows.count(glutGetWindow()))
+	void TextEditorWindow::SizeMenuCallback(int entryID)
+	{
+		switch (entryID)
+		{
+		
+		}
+	}
+
+	void TextEditorWindow::ColorMenuCallback(int entryID)
+	{
+		switch (entryID) {
+
+		}
+	}
+
+	void TextEditorWindow::MainMenuDispatcher(int entryID)
 	{
 		TextEditorWindow* tw = (TextEditorWindow*)g_windows[glutGetWindow()].get();
-		tw->MainMenuDispatcher(entryID);
+		TextEditor* te = tw->getTextEditor();
+		Document* ad = te->GetActiveDocument().get();
+
+		switch (entryID)
+		{
+		case 0:
+			ad->Save();
+		case -1:
+			exit(0);
+		}
 	}
-}
 
-void TextEditorWindow::FontMenuCallback(int entryID)
-{
-	switch (entryID) {
-
-	}
-}
-
-void TextEditorWindow::SizeMenuCallback(int entryID)
-{
-	switch (entryID)
+	TextEditor* TextEditorWindow::getTextEditor()
 	{
-		
+		return &m_textEditor;
 	}
-}
-
-void TextEditorWindow::ColorMenuCallback(int entryID)
-{
-	switch (entryID) {
-
-	}
-}
-
-void TextEditorWindow::MainMenuDispatcher(int entryID)
-{
-	TextEditorWindow* tw = (TextEditorWindow*)g_windows[glutGetWindow()].get();
-	TextEditor* te = tw->getTextEditor();
-	Document* ad = te->GetActiveDocument().get();
-
-	switch (entryID)
-	{
-	case 0:
-		ad->Save();
-	case -1:
-		exit(0);
-	}
-}
-
-TextEditor* TextEditorWindow::getTextEditor()
-{
-	return &m_textEditor;
-}
 
 
 	void TextEditorWindow::DisplayFunc()
@@ -307,16 +310,20 @@ TextEditor* TextEditorWindow::getTextEditor()
 			Vector2 pen = m_editorPos;
 			uint32_t charIndex = 0;
 
-			queue<Word> words;
-			for (auto word : m_words) {
-				words.push(word);
+			if (!m_words.empty()) {
+				queue<Word> words;
+				for (auto word : m_words) {
+					words.push(word);
+				}
+				// Render one row at a time
+				while (!words.empty()) {
+					vector<Word> row = GenerateRow(words);
+					pen.y += CalculateRowHeight(row);
+					RenderRow(row, pen, charIndex, document);
+				}
 			}
-			// Render one row at a time
-			while (!words.empty()) {
-				vector<Word> row = GenerateRow(words);
-				pen.y += CalculateRowHeight(row);
-				RenderRow(row,pen,charIndex,document);
-				
+			else {
+				RenderCarat(Vector2(m_editorPos.x, m_editorPos.y + document.GetSizeAt(0)), document.GetSizeAt(0));
 			}
 
 			// flush out the buffer contents
@@ -402,13 +409,32 @@ TextEditor* TextEditorWindow::getTextEditor()
 				break;
 			case GLUT_KEY_UP:
 				if (glutGetModifiers() & GLUT_ACTIVE_CTRL) {
-					uint32_t carat = document.GetCaratPosition();
-					uint32_t selectionBegin = std::min(document.GetSelectionStart(), carat);
-					uint32_t selectionEnd = std::max(document.GetSelectionStart(), carat);
-					document.SetSize(document.GetSizeAt(selectionBegin) + 1, selectionBegin, selectionEnd - selectionBegin);
+					document.SetSize(document.GetSizeAt(document.GetSelectionBegin()) + 2);
 					UpdateWords();
 					DisplayFunc();
 				}
+				break;
+			case GLUT_KEY_DOWN:
+				if (glutGetModifiers() & GLUT_ACTIVE_CTRL) {
+					document.SetSize(document.GetSizeAt(document.GetSelectionBegin()) - 2);
+					UpdateWords();
+					DisplayFunc();
+				}
+				break;
+			case GLUT_KEY_F1:
+				document.SetFont("times");
+				UpdateWords();
+				DisplayFunc();
+				break;
+			case GLUT_KEY_F2:
+				document.SetFont("arial");
+				UpdateWords();
+				DisplayFunc();
+				break;
+			case GLUT_KEY_F3:
+				document.SetFont("impact");
+				UpdateWords();
+				DisplayFunc();
 				break;
 			}
 		}
