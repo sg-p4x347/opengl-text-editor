@@ -4,6 +4,15 @@
 #include "FontUtil.h"
 #include "Font.h"
 
+TextEditorWindow::TextEditorWindow() : 
+	Window::Window("Text Editor", Vector2(), Vector2(400,400), 0.0, 1.0, 0.0, 1.0),
+	m_lineSpacing(12),
+	m_caratVisible(true),
+	m_editorPos(0.f,12.f)
+{
+	m_textEditor.NewDocument();
+	InitMenu();
+}
 namespace ote {
 	TextEditorWindow::TextEditorWindow() :
 		Window::Window("Text Editor", Vector2(), Vector2(400, 400), 0.0, 1.0, 0.0, 1.0),
@@ -299,16 +308,64 @@ namespace ote {
 		glVertex2f(point.x, point.y);
 	}
 
-	void TextEditorWindow::ToggleCarat(int value)
-	{
-		/*if (g_windows.count(value)) {
-			auto textEditorWindow = (TextEditorWindow*)(g_windows[value].get());
-			textEditorWindow->m_caratVisible = !textEditorWindow->m_caratVisible;
-			textEditorWindow->m_render();
+void TextEditorWindow::InitMenu()
+{
+	m_fontMenuID = glutCreateMenu(FontMenuCallback);
 
-		}
-		glutTimerFunc(1000, TextEditorWindow::ToggleCarat, value);*/
+	m_sizeMenuID = glutCreateMenu(SizeMenuCallback);
+
+	m_colorMenuID = glutCreateMenu(ColorMenuCallback);
+
+	m_mainMenuID = glutCreateMenu(MainMenuCallback);
+	glutAddSubMenu("Change Active Font", m_fontMenuID);
+	glutAddSubMenu("Change Active Size", m_sizeMenuID);
+	glutAddSubMenu("Change Active Color", m_colorMenuID);
+	glutAddMenuEntry("Exit", -1);
+
+	glutAttachMenu(GLUT_RIGHT_BUTTON);
+}
+
+void TextEditorWindow::MainMenuCallback(int entryID)
+{
+	switch (entryID)
+	{
+	case -1:
+		exit(0);
 	}
+}
+
+void TextEditorWindow::FontMenuCallback(int entryID)
+{
+	switch (entryID) {
+
+	}
+}
+
+void TextEditorWindow::SizeMenuCallback(int entryID)
+{
+	switch (entryID)
+	{
+
+	}
+}
+
+void TextEditorWindow::ColorMenuCallback(int entryID)
+{
+	switch (entryID) {
+
+	}
+}
+
+void TextEditorWindow::ToggleCarat(int value)
+{
+	/*if (g_windows.count(value)) {
+		auto textEditorWindow = (TextEditorWindow*)(g_windows[value].get());
+		textEditorWindow->m_caratVisible = !textEditorWindow->m_caratVisible;
+		textEditorWindow->m_render();
+		
+	}
+	glutTimerFunc(1000, TextEditorWindow::ToggleCarat, value);*/
+}
 
 	void TextEditorWindow::DisplayFunc()
 	{
