@@ -9,8 +9,10 @@ TextEditorWindow::TextEditorWindow() :
 	m_lineSpacing(8),
 	m_caratVisible(true),
 	m_text(""),
-	m_caratIndex(0)
-{
+	m_caratIndex(0),
+	m_tabWidth(50),
+	m_tabHeight(50)
+{	
 	int fontSize = 36;
 	string font = "times";
 	SetRender([=]() {
@@ -21,7 +23,7 @@ TextEditorWindow::TextEditorWindow() :
 		position.y += fontSize;
 
 		FontUtil::Render(*this, position, m_text, font, fontSize, Color());
-
+		
 
 		int caratPos = FontUtil::MeasureText(m_text.substr(0, m_caratIndex), font, fontSize);
 		// Render the carat
@@ -74,6 +76,28 @@ int TextEditorWindow::MeasureText(string text, void* font, int fontSize)
 {
 	return glutBitmapLength(font, (const unsigned char*)text.c_str());
 }
+
+void TextEditorWindow::drawDocumentTabs()
+{
+	vector<string> names = m_textEditor.getTabNames();
+	int length = names.size();
+	glBegin(GL_POLYGON);
+	int i = 0;
+	double y = 0;
+	double x = 0;
+	while( i < length){
+		x = x - m_tabWidth * i;
+		glVertex2f((GLfloat)x, (GLfloat)y);
+		glVertex2f((GLfloat)x, (GLfloat)y-m_tabHeight);
+		glVertex2f((GLfloat)x+m_tabWidth, (GLfloat)y-m_tabHeight);
+		glVertex2f((GLfloat)x+m_tabWidth, (GLfloat)y);
+
+		
+		i++;
+}
+
+}
+
 
 void TextEditorWindow::ToggleCarat(int value)
 {

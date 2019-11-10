@@ -8,5 +8,6 @@ private:
 	Document* m_active;
 public:
 	TextEditor();
+	vector<string> getTabNames();
 };
 

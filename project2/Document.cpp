@@ -148,6 +148,7 @@ int Document::getCaratPosition()
 	return m_caratPosition;
 }
 
+
 void Document::save()
 {
 	ofstream outFile;

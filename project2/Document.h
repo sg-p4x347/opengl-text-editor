@@ -50,7 +50,6 @@ public:
 	string getName();
 	void setCaratPosition(int position);
 	int getCaratPosition();
-
 	void save();
 };
 
