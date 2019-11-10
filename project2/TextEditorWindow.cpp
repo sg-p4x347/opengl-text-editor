@@ -225,17 +225,17 @@ namespace ote {
 
 void TextEditorWindow::InitMenu()
 {
-	m_fontMenuID = glutCreateMenu(FontMenuCallback);
+	m_fontMenuID = glutCreateMenu(TextEditorWindow::FontMenuDispatcher);
 
-	m_sizeMenuID = glutCreateMenu(SizeMenuCallback);
+	m_sizeMenuID = glutCreateMenu(TextEditorWindow::SizeMenuDispatcher);
 	for (int size = 8; size <= 14; ++size)
 	{
 		glutAddMenuEntry(std::to_string(size).c_str(), size);
 	}
 
-	m_colorMenuID = glutCreateMenu(ColorMenuCallback);
+	m_colorMenuID = glutCreateMenu(TextEditorWindow::ColorMenuDispatcher);
 
-	m_mainMenuID = glutCreateMenu(MainMenuCallback);
+	m_mainMenuID = glutCreateMenu(TextEditorWindow::MainMenuDispatcher);
 	glutAddSubMenu("Change Active Font", m_fontMenuID);
 	glutAddSubMenu("Change Active Size", m_sizeMenuID);
 	glutAddSubMenu("Change Active Color", m_colorMenuID);
@@ -245,7 +245,7 @@ void TextEditorWindow::InitMenu()
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
 
-void TextEditorWindow::MainMenuCallback(int entryID)
+void TextEditorWindow::MainMenuFunc(int entryID)
 {
 	if (g_windows.count(glutGetWindow()))
 	{
@@ -254,14 +254,14 @@ void TextEditorWindow::MainMenuCallback(int entryID)
 	}
 }
 
-void TextEditorWindow::FontMenuCallback(int entryID)
+void TextEditorWindow::FontMenuFunc(int entryID)
 {
 	switch (entryID) {
 
 	}
 }
 
-void TextEditorWindow::SizeMenuCallback(int entryID)
+void TextEditorWindow::SizeMenuFunc(int entryID)
 {
 	switch (entryID)
 	{
@@ -269,7 +269,7 @@ void TextEditorWindow::SizeMenuCallback(int entryID)
 	}
 }
 
-void TextEditorWindow::ColorMenuCallback(int entryID)
+void TextEditorWindow::ColorMenuFunc(int entryID)
 {
 	switch (entryID) {
 
