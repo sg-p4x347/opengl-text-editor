@@ -1,14 +1,15 @@
 #include "pch.h"
 #include "Document.h"
-
+#include "FontUtil.h"
 Document::Document() : 
 	m_name("document"),
 	m_caratPosition(0),
 	m_selectionStart(0),
 
 	m_defaultFont("times"),
-	m_defaultSize(12),
+	m_defaultSize(24),
 	m_defaultColor(0,0,0,1)
+
 {
 }
 
@@ -23,12 +24,12 @@ size_t Document::GetLength()
 {
 	return m_text.length();
 }
-void Document::InsertText(string text, uint32_t index)
+void Document::InsertText(string text, uint32_t index, string font, size_t size, Color color)
 {
 	// Extend the current styles at the insertion location
-	ExtendStyle(m_fonts, index, text.length(), m_defaultFont);
-	ExtendStyle(m_sizes, index, text.length(), m_defaultSize);
-	ExtendStyle(m_colors, index, text.length(), m_defaultColor);
+	InsertStyle(m_fonts, index, text.length(), font);
+	InsertStyle(m_sizes, index, text.length(), size);
+	InsertStyle(m_colors, index, text.length(), color);
 	// Insert the text into the entire document string
 	m_text.insert(index, text);
 }
@@ -49,7 +50,7 @@ void Document::SetFont(string font, uint32_t start, uint32_t size)
 }
 void Document::SetSize(size_t fontSize, uint32_t start, uint32_t size)
 {
-	SetStyle(m_sizes, start, Style<size_t>(size, fontSize));
+	SetStyle(m_sizes, start, Style<size_t>(size, std::min(FontUtil::GetMaxSize(), fontSize)));
 }
 void Document::SetColor(Color color, uint32_t start, uint32_t size)
 {
@@ -85,19 +86,29 @@ uint32_t Document::GetSelectionStart()
 	return m_selectionStart;
 }
 
+uint32_t Document::GetSelectionBegin()
+{
+	return std::min(m_selectionStart, m_caratPosition);
+}
+
+uint32_t Document::GetSelectionEnd()
+{
+	return std::max(m_selectionStart, m_caratPosition);
+}
+
 string Document::GetFontAt(uint32_t index)
 {
-	return GetStyle(m_fonts, index);
+	return GetStyle(m_fonts, index, m_defaultFont);
 }
 
 uint32_t Document::GetSizeAt(uint32_t index)
 {
-	return GetStyle(m_sizes, index);
+	return GetStyle(m_sizes, index, m_defaultSize);
 }
 
 Color Document::GetColorAt(uint32_t index)
 {
-	return GetStyle(m_colors, index);
+	return GetStyle(m_colors, index, m_defaultColor);
 }
 
 vector<Style<string>> & Document::GetFonts()
@@ -113,6 +124,24 @@ vector<Style<Color>> & Document::GetColors()
 vector<Style<size_t>> & Document::GetSizes()
 {
 	return m_sizes;
+}
+
+void Document::SetFont(string font)
+{
+	m_defaultFont = font;
+	SetStyle(m_fonts, GetSelectionBegin(), Style<string>(GetSelectionEnd() - GetSelectionBegin(), font));
+}
+
+void Document::SetSize(size_t size)
+{
+	m_defaultSize = size;
+	SetStyle(m_sizes, GetSelectionBegin(), Style<size_t>(GetSelectionEnd() - GetSelectionBegin(), size));
+}
+
+void Document::SetColor(Color color)
+{
+	m_defaultColor = color;
+	SetStyle(m_colors, GetSelectionBegin(), Style<Color>(GetSelectionEnd() - GetSelectionBegin(), color));
 }
 
 void Document::Save()

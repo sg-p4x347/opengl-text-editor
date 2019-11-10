@@ -7,6 +7,7 @@
 
 const path FontUtil::m_fontDirectory = "C:\\Windows\\Fonts";
 const int FontUtil::m_tabSizeInSpaces = 5;
+const size_t FontUtil::m_maxSize = 128;
 FontUtil& FontUtil::Get()
 {
 	static FontUtil utility;
@@ -43,7 +44,7 @@ FontUtil::FontUtil()
 	FTC_Manager_New(
 		m_freetype,
 		16,
-		128,
+		m_maxSize,
 		100000000, // 100 MB
 		FontUtil::FaceRequester,
 		this,
@@ -52,6 +53,15 @@ FontUtil::FontUtil()
 	FTC_ImageCache_New(
 		m_cacheManager,
 		&m_imageCache
+	);
+
+	FTC_SBitCache_New(
+		m_cacheManager,
+		&m_sbitCache
+	);
+	FTC_CMapCache_New(
+		m_cacheManager,
+		&m_cMapCache
 	);
 }
 
@@ -68,6 +78,23 @@ Font* FontUtil::GetFaceID(string font)
 	return faceId.get();
 }
 
+FTC_SBit FontUtil::GetCharBitmap(FTC_FaceID faceId, int size, char ch, FTC_Node * node)
+{
+	//* retrieve glyph index from character code */
+	FT_UInt glyph_index = FTC_CMapCache_Lookup(Get().m_cMapCache, faceId, 0, ch);
+
+	FTC_ScalerRec scaler;
+	scaler.face_id = faceId;
+	scaler.pixel = 1;
+	scaler.height = size;
+	scaler.width = 0;
+
+	FTC_SBit bitmap;
+	FTC_SBitCache_LookupScaler(Get().m_sbitCache, &scaler, FT_LOAD_DEFAULT | FT_LOAD_RENDER, glyph_index, &bitmap, node);
+
+	return bitmap;
+}
+
 void FontUtil::LogError(FT_Error& error)
 {
 	if (error) {
@@ -78,59 +105,27 @@ void FontUtil::LogError(FT_Error& error)
 void FontUtil::Render(Window& window, Vector2 position, string text, string font, int size, Color color)
 {
 	auto faceId = Get().GetFaceID(font);
-	FT_Face face;
-	FT_Error error = FTC_Manager_LookupFace(Get().m_cacheManager, faceId, &face);
-	FT_GlyphSlot slot = face->glyph;
-
 	for (char & ch : text)
 	{
-		if (ch != '\r') {
-			bool tab = false;
-			if (ch == '\t') {
-				tab = true;
-				ch = ' ';
-			}
-			//* retrieve glyph index from character code */
-			FT_UInt glyph_index = FT_Get_Char_Index(face, ch);
-
-			FT_Glyph glyph;
-			FTC_Node node;
-			FTC_ScalerRec scaler{
-				faceId,
-				0,
-				size,
-				1,
-				0,
-				0
-			};
-
-			error = FTC_ImageCache_LookupScaler(Get().m_imageCache, &scaler, FT_LOAD_DEFAULT, glyph_index, &glyph, &node);
-			error = FT_Set_Pixel_Sizes(face, 0, size);
-			LogError(error);
-			error = FT_Load_Glyph(face, glyph_index, FT_LOAD_DEFAULT);
-			LogError(error);
-			
-			/* convert to an anti-aliased bitmap */
-			error = FT_Render_Glyph(slot, FT_RENDER_MODE_NORMAL);
-			LogError(error);
-
-			if (!tab) {
-				Bitmap bmp(slot->bitmap.width, slot->bitmap.rows);
+		FTC_Node node;
+		auto bitmap = GetCharBitmap(faceId, size, ch, &node);
+		switch (ch) {
+			case '\r': break;
+			case '\t': position.x += bitmap->xadvance * m_tabSizeInSpaces; break;
+			default:
+				Bitmap bmp(bitmap->width, bitmap->height);
 				for (int x = 0; x < bmp.GetWidth(); x++) {
 					for (int y = 0; y < bmp.GetHeight(); y++) {
-						uint8_t A = slot->bitmap.buffer[y * slot->bitmap.width + x];
+						uint8_t A = bitmap->buffer[y * bitmap->width + x];
 						bmp.Set(x, (bmp.GetHeight() - 1) - y, Pixel(color.R * 255, color.G * 255, color.B * 255, ((A / 255.f) * color.A) * 255));
 					}
 				}
-				Vector2 world = window.ScreenToWorld(Vector2(position.x + slot->bitmap_left, (position.y + slot->bitmap.rows) - slot->bitmap_top));
+				Vector2 world = window.ScreenToWorld(Vector2(position.x + bitmap->left, (position.y + bitmap->height) - bitmap->top));
 				glRasterPos2d(world.x, world.y);
 				glDrawPixels(bmp.GetWidth(), bmp.GetHeight(), GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*)bmp.GetPixels());
 
-				position.x += slot->advance.x >> 6;
-			}
-			else {
-				position.x += (slot->advance.x >> 6)* m_tabSizeInSpaces;
-			}
+				position.x += bitmap->xadvance;
+				break;
 		}
 	}
 }
@@ -142,67 +137,30 @@ uint32_t FontUtil::NearestCharacterIndex(string text, string font, int size, int
 	if (offset <= 0)
 		return 0;
 
+	int lastCursorPos = 0;
 	int cursorPos = 0;
 	int cursorIndex = 0;
 	auto faceId = Get().GetFaceID(font);
-	FT_Face face;
-	FT_Error error = FTC_Manager_LookupFace(Get().m_cacheManager, faceId, &face);
-	FT_GlyphSlot slot = face->glyph;
-
 	for (char& ch : text)
 	{
-		if (ch != '\r') {
-			bool tab = false;
-			if (ch == '\t') {
-				tab = true;
-				ch = ' ';
-			}
-			//* retrieve glyph index from character code */
-			FT_UInt glyph_index = FT_Get_Char_Index(face, ch);
-
-			FT_Glyph glyph;
-			FTC_Node node;
-			FTC_ScalerRec scaler{
-				faceId,
-				0,
-				size,
-				1,
-				0,
-				0
-			};
-
-			error = FTC_ImageCache_LookupScaler(Get().m_imageCache, &scaler, FT_LOAD_DEFAULT, glyph_index, &glyph, &node);
-			error = FT_Set_Pixel_Sizes(face, 0, size);
-			error = FT_Load_Glyph(face, glyph_index, FT_LOAD_DEFAULT);
-			LogError(error);
-			/* convert to an anti-aliased bitmap */
-			error = FT_Render_Glyph(slot, FT_RENDER_MODE_NORMAL);
-			LogError(error);
-
-			int lastCursorPos = cursorPos;
-			int lastCursorIndex = cursorIndex;
-
-			if (!tab) {
-				cursorPos += slot->advance.x >> 6;
-			}
-			else {
-				cursorPos += (slot->advance.x >> 6)* m_tabSizeInSpaces;
-			}
-			cursorIndex++;
+		FTC_Node node;
+		auto bitmap = GetCharBitmap(faceId, size, ch, &node);
+		switch (ch) {
+		case '\r': break;
+		case '\t': cursorPos += bitmap->xadvance * m_tabSizeInSpaces; break;
+		default:
+			cursorPos += bitmap->xadvance;
 
 			if (lastCursorPos <= offset && cursorPos >= offset) {
 				if (noPass)
-					return std::max(0,lastCursorIndex);
+					return std::max(0, cursorIndex);
 
-				return (offset - lastCursorPos < cursorPos - offset) ? lastCursorIndex : cursorIndex;
+				return (offset - lastCursorPos < cursorPos - offset) ? cursorIndex : cursorIndex + 1;
 			}
-			
+			break;
 		}
-		else {
-			cursorIndex++;
-		}
+		cursorIndex++;
 	}
-
 	// The offset does not lie between indices, therefore it must associate with the length of the text
 	return cursorIndex;
 }
@@ -211,48 +169,23 @@ int FontUtil::MeasureText(string text, string font, int size)
 {
 	int width = 0;
 	auto faceId = Get().GetFaceID(font);
-	FT_Face face;
-	FT_Error error = FTC_Manager_LookupFace(Get().m_cacheManager, faceId, &face);
-	FT_GlyphSlot slot = face->glyph;
 
 	for (char& ch : text)
 	{
-		if (ch != '\r') {
-			bool tab = false;
-			if (ch == '\t') {
-				tab = true;
-				ch = ' ';
-			}
-			//* retrieve glyph index from character code */
-			FT_UInt glyph_index = FT_Get_Char_Index(face, ch);
-
-			FT_Glyph glyph;
-			FTC_Node node;
-			FTC_ScalerRec scaler{
-				faceId,
-				0,
-				size,
-				1,
-				0,
-				0
-			};
-
-			error = FTC_ImageCache_LookupScaler(Get().m_imageCache, &scaler, FT_LOAD_DEFAULT, glyph_index, &glyph, &node);
-			error = FT_Set_Pixel_Sizes(face, 0, size);
-			error = FT_Load_Glyph(face, glyph_index, FT_LOAD_DEFAULT);
-			LogError(error);
-			/* convert to an anti-aliased bitmap */
-			error = FT_Render_Glyph(slot, FT_RENDER_MODE_NORMAL);
-			LogError(error);
-			if (!tab) {
-				width += slot->advance.x >> 6;
-			}
-			else {
-				width += (slot->advance.x >> 6)* m_tabSizeInSpaces;
-			}
+		FTC_Node node;
+		auto bitmap = GetCharBitmap(faceId, size, ch, &node);
+		switch (ch) {
+		case '\r': break;
+		case '\t': width += bitmap->xadvance * m_tabSizeInSpaces; break;
+		default: width += bitmap->xadvance; break;
 		}
 	}
 	return width;
+}
+
+size_t FontUtil::GetMaxSize()
+{
+	return m_maxSize;
 }
 
 vector<string> FontUtil::ListFonts()

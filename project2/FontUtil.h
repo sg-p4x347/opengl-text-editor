@@ -48,22 +48,26 @@ public:
 		// The font height in pixels
 		int size
 	);
+	static size_t GetMaxSize();
 	static vector<string> ListFonts();
 private:
 	// Statics
 	static FontUtil& Get();
 	static const path m_fontDirectory;
 	static const int m_tabSizeInSpaces;
+	static const size_t m_maxSize;
 	static FT_Error FaceRequester(FTC_FaceID faceId, FT_Library library, FT_Pointer requestData, FT_Face* fontFace);
 	static void LogError(FT_Error& error);
+	static FTC_SBit GetCharBitmap(FTC_FaceID faceId, int size, char ch, FTC_Node * node);
 private:
 	FontUtil();
 	Font* GetFaceID(string font);
-	
+
 	FT_Library m_freetype;
 	FTC_Manager m_cacheManager;
 	FTC_ImageCache m_imageCache;
+	FTC_CMapCache m_cMapCache;
+	FTC_SBitCache m_sbitCache;
 
 	map<string, shared_ptr<Font>> m_fonts;
 };
-

@@ -38,10 +38,6 @@ namespace ote {
 		TextEditor m_textEditor;
 		vector<Word> m_words;
 
-		string m_font;
-		size_t m_size;
-		Color m_color;
-
 		int m_mainMenuID;
 		int m_fontMenuID;
 		int m_sizeMenuID;

@@ -9,15 +9,13 @@ namespace ote {
 		Window::Window("Text Editor", Vector2(), Vector2(400,400), 0.0, 1.0, 0.0, 1.0),
 		m_lineSpacing(12),
 		m_caratVisible(true),
-		m_editorPos(0.f,0.f),
+		m_editorPos(0.f,0.f)
 
-		m_font("times"),
-		m_size(24),
-		m_color(0,0,0,1)
 	{
 		m_textEditor.NewDocument();
 		InitMenu();
 		glutTimerFunc(500,Window::TimerFuncDispatcher, m_id);
+		UpdateWords();
 	}
 
 	int TextEditorWindow::MeasureText(string text, void* font, int fontSize)
@@ -70,7 +68,32 @@ namespace ote {
 		m_words.clear();
 		if (m_textEditor.GetActiveDocument()) {
 			Document& document = *m_textEditor.GetActiveDocument();
-			m_words.push_back(Word(document.GetText(), m_font, m_size, m_color));
+
+			shared_ptr<Word> word = nullptr;
+			string& text = document.GetText();
+			for (int charIndex = 0; charIndex < document.GetLength(); charIndex++) {
+				auto& fontStyle = document.GetFonts()[charIndex];
+				auto& sizeStyle = document.GetSizes()[charIndex];
+				auto& colorStyle = document.GetColors()[charIndex];
+
+				// If no word exists, create one
+				if (!word) {
+					word = std::make_shared<Word>(string(1,text[charIndex]), fontStyle.Data, sizeStyle.Data, colorStyle.Data);
+				}
+				// If no styles have changed, add this character to the word
+				else if (word->Font == fontStyle.Data && word->Size == sizeStyle.Data && word->Colour == colorStyle.Data) {
+					word->Text += text[charIndex];
+				}
+				// Add this word to the m_words vector for later processing
+				else {
+					m_words.push_back(*word);
+					// Clear the word and backtrack to start the next word with this character
+					word = nullptr;
+					charIndex--;
+				}
+			}
+			if (word)
+				m_words.push_back(*word);
 		}
 	}
 
@@ -311,8 +334,8 @@ void TextEditorWindow::ColorMenuCallback(int entryID)
 		if (m_textEditor.GetActiveDocument()) {
 			Document& document = *m_textEditor.GetActiveDocument();
 			uint32_t carat = document.GetCaratPosition();
-			uint32_t selectionBegin = std::min(document.GetSelectionStart(), carat);
-			uint32_t selectionEnd = std::max(document.GetSelectionStart(), carat);
+			uint32_t selectionBegin = document.GetSelectionBegin();
+			uint32_t selectionEnd = document.GetSelectionEnd();
 			document.RemoveText(selectionBegin, selectionEnd - selectionBegin);
 			switch (key) {
 			case 8:
@@ -326,7 +349,7 @@ void TextEditorWindow::ColorMenuCallback(int entryID)
 				UpdateWords();
 				break;
 			default:
-				document.InsertText(string(1, (char)key), selectionBegin);
+				document.InsertText(string(1, (char)key), selectionBegin,document.GetFontAt(selectionBegin),document.GetSizeAt(selectionBegin),document.GetColorAt(selectionBegin));
 				MoveCarat(document, selectionBegin + 1, true);
 				
 
