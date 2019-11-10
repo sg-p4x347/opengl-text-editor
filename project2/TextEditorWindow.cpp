@@ -11,6 +11,7 @@ TextEditorWindow::TextEditorWindow() :
 	m_editorPos(0.f,12.f)
 {
 	m_textEditor.NewDocument();
+	InitMenu();
 }
 
 int TextEditorWindow::MeasureText(string text, void* font, int fontSize)
@@ -125,6 +126,54 @@ void TextEditorWindow::RenderWord(Word& word, Vector2& pen, size_t& rowHeight, u
 			}
 		}
 		charIndex += word.Text.length();
+	}
+}
+
+void TextEditorWindow::InitMenu()
+{
+	m_fontMenuID = glutCreateMenu(FontMenuCallback);
+
+	m_sizeMenuID = glutCreateMenu(SizeMenuCallback);
+
+	m_colorMenuID = glutCreateMenu(ColorMenuCallback);
+
+	m_mainMenuID = glutCreateMenu(MainMenuCallback);
+	glutAddSubMenu("Change Active Font", m_fontMenuID);
+	glutAddSubMenu("Change Active Size", m_sizeMenuID);
+	glutAddSubMenu("Change Active Color", m_colorMenuID);
+	glutAddMenuEntry("Exit", -1);
+
+	glutAttachMenu(GLUT_RIGHT_BUTTON);
+}
+
+void TextEditorWindow::MainMenuCallback(int entryID)
+{
+	switch (entryID)
+	{
+	case -1:
+		exit(0);
+	}
+}
+
+void TextEditorWindow::FontMenuCallback(int entryID)
+{
+	switch (entryID) {
+
+	}
+}
+
+void TextEditorWindow::SizeMenuCallback(int entryID)
+{
+	switch (entryID)
+	{
+
+	}
+}
+
+void TextEditorWindow::ColorMenuCallback(int entryID)
+{
+	switch (entryID) {
+
 	}
 }
 
