@@ -14,8 +14,13 @@ public:
 	string& GetText();
 	size_t GetLength();
 
-	void InsertText(string text, uint32_t index);
+	void InsertText(string text, uint32_t index, string font, size_t size, Color color);
 	void RemoveText(uint32_t index, size_t size);
+
+	void SetFont(string font, uint32_t start, uint32_t size);
+	void SetSize(size_t fontSize, uint32_t start, uint32_t size);
+	void SetColor(Color color, uint32_t start, uint32_t size);
+
 	void SetName(string name);
 	string GetName();
 
@@ -25,6 +30,9 @@ public:
 	void SetSelectionStart(uint32_t position);
 	uint32_t GetSelectionStart();
 
+	uint32_t GetSelectionBegin();
+	uint32_t GetSelectionEnd();
+
 	string GetFontAt(uint32_t index);
 	uint32_t GetSizeAt(uint32_t index);
 	Color GetColorAt(uint32_t index);
@@ -33,6 +41,10 @@ public:
 	vector<Style<Color>> & GetColors();
 	vector<Style<size_t>> & GetSizes();
 
+	void SetFont(string font);
+	void SetSize(size_t size);
+	void SetColor(Color color);
+
 	void Save();
 private:
 	template<typename DataType>
@@ -40,13 +52,13 @@ private:
 
 	// Returns the starting style index where changes took place
 	template<typename DataType>
-	uint32_t RemoveStyle(vector<Style<DataType>>& styles, uint32_t start, size_t size);
+	void RemoveStyle(vector<Style<DataType>>& styles, uint32_t start, size_t size);
 
 	template<typename DataType>
-	void ExtendStyle(vector<Style<DataType>>& styles, uint32_t start, size_t size);
+	void InsertStyle(vector<Style<DataType>>& styles, uint32_t start, size_t size, DataType value);
 
 	template<typename DataType>
-	DataType GetStyle(vector<Style<DataType>>& styles, uint32_t index);
+	DataType GetStyle(vector<Style<DataType>>& styles, uint32_t index, DataType defaultValue);
 private:
 	string m_text;
 
@@ -68,86 +80,32 @@ private:
 template<typename DataType>
 inline void Document::SetStyle(vector<Style<DataType>>& styles, uint32_t start, Style<DataType>&& style)
 {
-	uint32_t insertionIndex = RemoveStyle(styles, start, style.Size);
-	// Insert the new style
-	if (insertionIndex == styles.size() || styles.size() == 0) {
-		styles.push_back(style);
-	}
-	else {
-		styles.insert(styles.begin() + insertionIndex, style);
-	}
+	for (int i = start; i < start + style.Size; i++)
+		styles[i] = style;
 }
 
 template<typename DataType>
-inline uint32_t Document::RemoveStyle(vector<Style<DataType>>& styles, uint32_t start, size_t size)
+inline void Document::RemoveStyle(vector<Style<DataType>>& styles, uint32_t start, size_t size)
 {
-	uint32_t end = start + size - 1; // Minus 1 to be inclusive of the end
-	uint32_t i = 0;
-	uint32_t currentStart = 0;
-	while (i < styles.size()) {
-		Style<DataType> currentStyle = styles[i];
-		uint32_t currentEnd = currentStart + currentStyle.Size - 1; // Minus 1 to be inclusive of the end
-		// If an intersection exists, handle one of the 4 cases
-		if (currentStart <= currentEnd && currentStart <= end) {
-			// The new style overlaps the end of the current style
-			if (end >= currentEnd) {
-				currentStyle.Size = start - currentStart;
-				styles[i] = currentStyle;
-				i++;
-			}
-			// The new style overlaps the start of the current style
-			else if (start <= currentStart) {
-				currentStyle.Size = currentEnd - end;
-				styles[i] = currentStyle;
-				break;
-			}
-			// The new style completely overlaps the current style
-			else if (start <= currentStart && end >= currentEnd) {
-				styles.erase(styles.begin() + i);
-			}
-			// The new style is inserted into the middle of the current style
-			else if (currentStart < start && currentEnd > end) {
-				currentStyle.Size = start - currentStart;
-				styles[i] = currentStyle;
-				i++;
-				// Split the current style into two, and insert the second one right after the first
-				currentStyle.Size = currentEnd - end;
-				styles.insert(styles.begin() + i, currentStyle);
-
-				break;
-			}
-		}
-		currentStart += currentStyle.Size;
-	}
-	return i;
+	styles.erase(styles.begin() + start, styles.begin() + start + size);
 }
 
 template<typename DataType>
-inline void Document::ExtendStyle(vector<Style<DataType>>& styles, uint32_t start, size_t size)
+inline void Document::InsertStyle(vector<Style<DataType>>& styles, uint32_t start, size_t size, DataType value)
 {
 	// Push current styles back to accomodate the new style
 	uint32_t currentStart = 0;
 	int styleIndex = 0;
-	for (auto& currentStyle : styles) {
-		uint32_t currentEnd = currentStart + currentStyle.Size - 1;
-		if (start >= currentStart && start <= currentEnd || styleIndex == styles.size() - 1) {
-			currentStyle.Size += size;
-			break;
-		}
-		styleIndex++;
+	for (int i = 0; i < size; i++) {
+		styles.insert(styles.begin() + start, Style<DataType>(size, value));
 	}
 }
 
 template<typename DataType>
-inline DataType Document::GetStyle(vector<Style<DataType>>& styles, uint32_t index)
+inline DataType Document::GetStyle(vector<Style<DataType>>& styles, uint32_t index, DataType defaultValue)
 {
-	uint32_t currentStart = 0;
-	for (auto& style : styles) {
-		uint32_t currentEnd = currentStart + style.Size - 1;
-		if (index >= currentStart && index <= currentEnd) {
-			return style.Data;
-		}
-	}
-	// This should never be reached
-	return DataType();
+	if (index < styles.size())
+		return styles[index].Data;
+
+	return defaultValue;
 }

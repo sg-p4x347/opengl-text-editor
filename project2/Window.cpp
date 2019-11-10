@@ -26,13 +26,18 @@ Window::Window(
 	// specify a viewing area
 	gluOrtho2D(left, right, bottom, top);
 	// Register callbacks
-	glutDisplayFunc(Window::DisplayFuncDispatcher);
+	glutDisplayFunc(Window::Render);
 	glutIdleFunc(Window::IdleFuncDispatcher);
 	glutMouseFunc(Window::MouseFuncDispatcher);
+	glutMotionFunc(Window::MotionFuncDispatcher);
 	glutKeyboardFunc(Window::KeyboardFuncDispatcher);
 	glutKeyboardUpFunc(Window::KeyboardUpFuncDispatcher);
 	glutSpecialFunc(Window::SpecialFuncDispatcher);
 	glutSpecialUpFunc(Window::SpecialUpFuncDispatcher);
+	glutCreateMenu(Window::MainMenuDispatcher);
+	glutCreateMenu(Window::FontMenuDispatcher);
+	glutCreateMenu(Window::SizeMenuDispatcher);
+	glutCreateMenu(Window::ColorMenuDispatcher);
 	// Initialize rendering configurations
 	glutInitDisplayMode(GLUT_ALPHA);
 	glClearColor(1.f, 1.f, 1.f, 1.f);
@@ -80,7 +85,7 @@ Vector2 Window::ScreenToWorld(Vector2 screen)
 }
 
 
-void Window::DisplayFuncDispatcher()
+void Window::Render()
 {
 	if (g_windows.count(glutGetWindow()))
 		g_windows[glutGetWindow()]->DisplayFunc();
@@ -96,6 +101,12 @@ void Window::MouseFuncDispatcher(int button, int state, int x, int y)
 {
 	if (g_windows.count(glutGetWindow()))
 		g_windows[glutGetWindow()]->MouseFunc(button, state, x, y);
+}
+
+void Window::MotionFuncDispatcher(int x, int y)
+{
+	if (g_windows.count(glutGetWindow()))
+		g_windows[glutGetWindow()]->MotionFunc(x, y);
 }
 
 void Window::KeyboardFuncDispatcher(unsigned char key, int x, int y)
@@ -122,6 +133,36 @@ void Window::SpecialUpFuncDispatcher(int key, int x, int y)
 		g_windows[glutGetWindow()]->SpecialUpFunc(key, x, y);
 }
 
+void Window::TimerFuncDispatcher(int value)
+{
+	if (g_windows.count(glutGetWindow()))
+		g_windows[glutGetWindow()]->TimerFunc(value);
+}
+
+void Window::MainMenuDispatcher(int entryID)
+{
+	if (g_windows.count(glutGetWindow()))
+		g_windows[glutGetWindow()]->MainMenuFunc(entryID);
+}
+
+void Window::FontMenuDispatcher(int entryID)
+{
+	if (g_windows.count(glutGetWindow()))
+		g_windows[glutGetWindow()]->FontMenuFunc(entryID);
+}
+
+void Window::SizeMenuDispatcher(int entryID)
+{
+	if (g_windows.count(glutGetWindow()))
+		g_windows[glutGetWindow()]->SizeMenuFunc(entryID);
+}
+
+void Window::ColorMenuDispatcher(int entryID)
+{
+	if (g_windows.count(glutGetWindow()))
+		g_windows[glutGetWindow()]->ColorMenuFunc(entryID);
+}
+
 void Window::DisplayFunc()
 {
 }
@@ -131,6 +172,10 @@ void Window::IdleFunc()
 }
 
 void Window::MouseFunc(int button, int state, int x, int y)
+{
+}
+
+void Window::MotionFunc(int x, int y)
 {
 }
 
@@ -152,6 +197,26 @@ void Window::SpecialFunc(int key, int x, int y)
 void Window::SpecialUpFunc(int key, int x, int y)
 {
 	m_specialKeys[key] = false;
+}
+
+void Window::TimerFunc(int value)
+{
+}
+
+void Window::MainMenuFunc(int entryID)
+{
+}
+
+void Window::FontMenuFunc(int entryID)
+{
+}
+
+void Window::SizeMenuFunc(int entryID)
+{
+}
+
+void Window::ColorMenuFunc(int entryID)
+{
 }
 
 shared_ptr<Window> Window::Create(shared_ptr<Window> window)

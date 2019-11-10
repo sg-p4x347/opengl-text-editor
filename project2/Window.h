@@ -22,21 +22,33 @@ public:
 	void Hide();
 	Vector2 ScreenToWorld(Vector2 screen);
 	// Dispatchers
-	static void DisplayFuncDispatcher();
+	static void Render();
 	static void IdleFuncDispatcher();
 	static void MouseFuncDispatcher(int button, int state, int x, int y);
+	static void MotionFuncDispatcher(int x, int y);
 	static void KeyboardFuncDispatcher(unsigned char key, int x, int y);
 	static void KeyboardUpFuncDispatcher(unsigned char key, int x, int y);
 	static void SpecialFuncDispatcher(int key, int x, int y);
 	static void SpecialUpFuncDispatcher(int key, int x, int y);
+	static void TimerFuncDispatcher(int value);
+	static void MainMenuDispatcher(int entryID);
+	static void FontMenuDispatcher(int entryID);
+	static void SizeMenuDispatcher(int entryID);
+	static void ColorMenuDispatcher(int entryID);
 	// Virtual callbacks
 	virtual void DisplayFunc();
 	virtual void IdleFunc();
 	virtual void MouseFunc(int button, int state, int x, int y);
+	virtual void MotionFunc(int x, int y);
 	virtual void KeyboardFunc(unsigned char key, int x, int y);
 	virtual void KeyboardUpFunc(unsigned char key, int x, int y);
 	virtual void SpecialFunc(int key, int x, int y);
 	virtual void SpecialUpFunc(int key, int x, int y);
+	virtual void TimerFunc(int value);
+	virtual void MainMenuFunc(int entryID);
+	virtual void FontMenuFunc(int entryID);
+	virtual void SizeMenuFunc(int entryID);
+	virtual void ColorMenuFunc(int entryID);
 
 	static shared_ptr<Window> Create(shared_ptr<Window> window);
 	static void Delete(int id);

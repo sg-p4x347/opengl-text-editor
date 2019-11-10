@@ -98,7 +98,8 @@
       <AdditionalDependencies>$(SolutionDir)freetype/win32/freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>copy "$(SolutionDir)freetype\win32\freetype.dll" "$(OutDir)"</Command>
+      <Command>copy "$(SolutionDir)freetype\win32\freetype.dll" "$(OutDir)"
+copy "$(SolutionDir)*.bmp" "$(OutDir)"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -115,7 +116,8 @@
       <AdditionalDependencies>$(SolutionDir)freetype/win64/freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>copy "$(SolutionDir)freetype\win64\freetype.dll" "$(OutDir)"</Command>
+      <Command>copy "$(SolutionDir)freetype\win64\freetype.dll" "$(OutDir)"
+copy "$(SolutionDir)*.bmp" "$(OutDir)"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -136,7 +138,8 @@
       <AdditionalDependencies>$(SolutionDir)freetype/win32/freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>copy "$(SolutionDir)freetype\win32\freetype.dll" "$(OutDir)"</Command>
+      <Command>copy "$(SolutionDir)freetype\win32\freetype.dll" "$(OutDir)"
+copy "$(SolutionDir)*.bmp" "$(OutDir)"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -157,7 +160,8 @@
       <AdditionalDependencies>$(SolutionDir)freetype/win64/freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>copy "$(SolutionDir)freetype\win64\freetype.dll" "$(OutDir)"</Command>
+      <Command>copy "$(SolutionDir)freetype\win64\freetype.dll" "$(OutDir)"
+copy "$(SolutionDir)*.bmp" "$(OutDir)"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -167,7 +171,9 @@
     <ClCompile Include="Document.cpp" />
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="FontUtil.cpp" />
+    <ClCompile Include="HelpWindow.cpp" />
     <ClCompile Include="Pixel.cpp" />
+    <ClCompile Include="Rectangle.cpp" />
     <ClCompile Include="TextEditor.cpp" />
     <ClCompile Include="TextEditorWindow.cpp" />
     <ClCompile Include="Vector2.cpp" />
@@ -176,23 +182,25 @@
     <ClCompile Include="Word.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="Bitmap.h" />
     <ClInclude Include="Button.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="Font.h" />
     <ClInclude Include="FontUtil.h" />
     <ClInclude Include="Document.h" />
+    <ClInclude Include="HelpWindow.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Pixel.h" />
+    <ClInclude Include="Rectangle.h" />
     <ClInclude Include="Style.h" />
     <ClInclude Include="TextEditor.h" />
     <ClInclude Include="TextEditorWindow.h" />
     <ClInclude Include="Vector2.h" />
     <ClInclude Include="Window.h" />
     <ClInclude Include="Word.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
