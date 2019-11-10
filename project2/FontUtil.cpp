@@ -202,7 +202,7 @@ vector<string> FontUtil::ListFonts()
 			FT_Face face;
 			FTC_Manager_LookupFace(Get().m_cacheManager, faceId, &face);
 
-			if (fontFamilyNames.size() == 0 || fontFamilyNames[fontFamilyNames.size() - 1] != face->family_name) {
+			if (face && (fontFamilyNames.size() == 0 || fontFamilyNames[fontFamilyNames.size() - 1] != face->family_name)) {
 				fontFamilyNames.push_back(face->family_name);
 			}
 		}
