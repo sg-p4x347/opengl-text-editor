@@ -52,6 +52,10 @@ namespace ote {
 		static void FontMenuCallback(int entryID);
 		static void SizeMenuCallback(int entryID);
 		static void ColorMenuCallback(int entryID);
+
+		static void MainMenuDispatcher(int entryID);
+
+		TextEditor* getTextEditor();
 	};
 }
 
