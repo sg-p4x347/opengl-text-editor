@@ -30,7 +30,7 @@ public:
 	static void KeyboardUpFuncDispatcher(unsigned char key, int x, int y);
 	static void SpecialFuncDispatcher(int key, int x, int y);
 	static void SpecialUpFuncDispatcher(int key, int x, int y);
-
+	static void TimerFuncDispatcher(int value);
 	// Virtual callbacks
 	virtual void DisplayFunc();
 	virtual void IdleFunc();
@@ -40,6 +40,7 @@ public:
 	virtual void KeyboardUpFunc(unsigned char key, int x, int y);
 	virtual void SpecialFunc(int key, int x, int y);
 	virtual void SpecialUpFunc(int key, int x, int y);
+	virtual void TimerFunc(int value);
 
 	static shared_ptr<Window> Create(shared_ptr<Window> window);
 	static void Delete(int id);

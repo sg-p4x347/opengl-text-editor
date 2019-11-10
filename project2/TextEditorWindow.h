@@ -10,13 +10,13 @@ namespace ote {
 	{
 	public:
 		TextEditorWindow();
-		static void ToggleCarat(int value);
 		// Callbacks
 		virtual void DisplayFunc() override;
 		virtual void MouseFunc(int button, int state, int x, int y) override;
 		virtual void MotionFunc(int x, int y) override;
 		virtual void KeyboardFunc(unsigned char key, int x, int y) override;
 		virtual void SpecialFunc(int key, int x, int y) override;
+		virtual void TimerFunc(int value) override;
 	private:
 		void InitMenu();
 		int MeasureText(string text, void* font, int fontSize);
@@ -37,6 +37,10 @@ namespace ote {
 		bool m_caratVisible;
 		TextEditor m_textEditor;
 		vector<Word> m_words;
+
+		string m_font;
+		size_t m_size;
+		Color m_color;
 
 		int m_mainMenuID;
 		int m_fontMenuID;

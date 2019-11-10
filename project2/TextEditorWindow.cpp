@@ -9,10 +9,15 @@ namespace ote {
 		Window::Window("Text Editor", Vector2(), Vector2(400,400), 0.0, 1.0, 0.0, 1.0),
 		m_lineSpacing(12),
 		m_caratVisible(true),
-		m_editorPos(0.f,0.f)
+		m_editorPos(0.f,0.f),
+
+		m_font("times"),
+		m_size(24),
+		m_color(0,0,0,1)
 	{
 		m_textEditor.NewDocument();
 		InitMenu();
+		glutTimerFunc(500,Window::TimerFuncDispatcher, m_id);
 	}
 
 	int TextEditorWindow::MeasureText(string text, void* font, int fontSize)
@@ -65,115 +70,9 @@ namespace ote {
 		m_words.clear();
 		if (m_textEditor.GetActiveDocument()) {
 			Document& document = *m_textEditor.GetActiveDocument();
-
-			int fontIndex = 0;
-			int sizeIndex = 0;
-			int colorIndex = 0;
-
-			uint32_t fontStart = 0;
-			uint32_t sizeStart = 0;
-			uint32_t colorStart = 0;
-
-			uint32_t charIndex = 0;
-			uint32_t styleStart = 0;
-			uint32_t styleSize = 0;
-			while (charIndex < document.GetLength()) {
-				auto& fontStyle = document.GetFonts()[fontIndex];
-				auto& sizeStyle = document.GetSizes()[sizeIndex];
-				auto& colorStyle = document.GetColors()[colorIndex];
-
-				uint32_t fontEnd = fontStart + fontStyle.Size - 1;
-				uint32_t sizeEnd = sizeStart + sizeStyle.Size - 1;
-				uint32_t colorEnd = colorStart + colorStyle.Size - 1;
-
-				
-				bool styleChanged = false;
-
-				if (!(charIndex >= fontStart && charIndex <= fontEnd)) {
-					fontIndex++;
-					fontStart += fontStyle.Size;
-					styleChanged = true;
-				}
-				if (!(charIndex >= sizeStart && charIndex <= sizeEnd)) {
-					sizeIndex++;
-					sizeStart += sizeStyle.Size;
-					styleChanged = true;
-				}
-				if (!(charIndex >= fontStart && charIndex <= colorEnd)) {
-					colorIndex++;
-					colorStart += colorStyle.Size;
-					styleChanged = true;
-				}
-				
-				// A style has changed, render this section of the document
-				if (styleChanged || charIndex == document.GetLength() - 1) {
-					if (!styleChanged && charIndex == document.GetLength() - 1)
-						styleSize++;
-					string text = document.GetText().substr(styleStart, styleSize);
-					m_words.push_back(Word(text, fontStyle.Data, sizeStyle.Data, colorStyle.Data));
-					styleSize = 0;
-					styleStart = charIndex;
-				}
-				charIndex++;
-				styleSize++;
-				
-			}
+			m_words.push_back(Word(document.GetText(), m_font, m_size, m_color));
 		}
 	}
-
-	//void TextEditorWindow::RenderWord(Word& word, Vector2& pen, size_t& rowHeight, uint32_t& charIndex, uint32_t& carat, int& windowWidth)
-	//{
-
-
-	//	uint32_t index = FontUtil::NearestCharacterIndex(word.Text, word.Font, word.Size, windowWidth - pen.x);
-	//	uint32_t carriageReturn = word.Text.find('\r');
-	//	if (carriageReturn != string::npos && carriageReturn <= index) {
-	//		index = carriageReturn;
-	//		word.Text.erase(carriageReturn, 1);
-	//		charIndex++;
-	//	}
-	//	if (index < word.Text.length() || pen.x >= windowWidth) {
-
-	//		if (index < word.Text.length()) {
-	//			// Split this word and recursively render each part on separate lines
-	//			Word left(word.Text.substr(0, index), word.Font, word.Size, word.Colour);
-	//			word.Text = word.Text.substr(index);
-	//			RenderWord(left, pen, rowHeight, charIndex, carat, windowWidth);
-	//		}
-	//		// word wrap
-	//		pen.x = m_editorPos.x;
-	//		pen.y += rowHeight + m_lineSpacing;
-	//		RenderWord(word, pen, rowHeight, charIndex, carat, windowWidth);
-	//	}
-	//	else if (index == word.Text.length()) {
-	//		FontUtil::Render(*this, pen, word.Text, word.Font, word.Size, word.Colour);
-	//		pen.x += FontUtil::MeasureText(word.Text, word.Font, word.Size);
-	//		rowHeight = std::max(rowHeight, word.Size);
-
-	//		if (m_caratVisible) {
-	//			// Render the carat here
-	//			Vector2 caratPos = pen;
-	//			if (carat >= charIndex && carat <= charIndex + word.Text.length()) {
-
-	//				if (carat < word.Text.length()) {
-	//					// Offset the carat within the word
-	//					caratPos.x += FontUtil::MeasureText(word.Text.substr(0, carat - charIndex), word.Font, word.Size);
-	//				}
-
-	//				glLineWidth(1);
-	//				glColor3f(0, 0, 0);
-	//				glBegin(GL_LINES);
-
-	//				Vector2 start = ScreenToWorld(caratPos);
-	//				glVertex2f(start.x, start.y);
-	//				Vector2 end = ScreenToWorld(caratPos - Vector2(0, word.Size));
-	//				glVertex2f(end.x, end.y);
-	//				glEnd();
-	//			}
-	//		}
-	//		charIndex += word.Text.length();
-	//	}
-	//}
 
 	vector<Word> TextEditorWindow::GenerateRow(queue<Word>& words)
 	{
@@ -184,14 +83,16 @@ namespace ote {
 		while (!words.empty()) {
 			Word word = words.front();
 			words.pop();
-			uint32_t index = FontUtil::NearestCharacterIndex(word.Text, word.Font, word.Size, windowWidth - x, true);
-			uint32_t carriageReturn = word.Text.find('\r');
-			if (index < word.Text.length() || x >= windowWidth || carriageReturn != string::npos) {
-
+			
+			size_t carriageReturnOffset = 0;
+			if (word.Text[0] == '\r')
+				carriageReturnOffset = 1;
+			uint32_t index = std::min(FontUtil::NearestCharacterIndex(word.Text, word.Font, word.Size, windowWidth - x, true), word.Text.find('\r', carriageReturnOffset));
+			if (carriageReturnOffset <= index && index < word.Text.length() || x >= windowWidth) {
 				if (index < word.Text.length()) {
 					// Split this word and recursively render each part on separate lines
-					Word left(word.Text.substr(0, carriageReturn != string::npos ? index + 1 : index), word.Font, word.Size, word.Colour);
-					word.Text = word.Text.substr(carriageReturn != string::npos ? index + 1 : index);
+					Word left(word.Text.substr(0, index), word.Font, word.Size, word.Colour);
+					word.Text = word.Text.substr(index);
 					row.push_back(left);
 				}
 				// word wrap
@@ -248,14 +149,14 @@ namespace ote {
 			if (m_caratVisible) {
 				// Render the carat here
 				Vector2 caratPos = pen;
-				if (carat >= charIndex && carat <= charIndex + word.Text.length()) {
+				if (carat == 0 && charIndex == 0 || carat > charIndex && carat <= charIndex + word.Text.length()) {
 
 					//if (carat < word.Text.length()) {
 						// Offset the carat within the word
 						caratPos.x += FontUtil::MeasureText(word.Text.substr(0, carat - charIndex), word.Font, word.Size);
 					//}
 
-					glLineWidth(1);
+					glLineWidth(2);
 					glColor3f(0, 0, 0);
 					glBegin(GL_LINES);
 
@@ -347,16 +248,6 @@ void TextEditorWindow::ColorMenuCallback(int entryID)
 	}
 }
 
-void TextEditorWindow::ToggleCarat(int value)
-{
-	/*if (g_windows.count(value)) {
-		auto textEditorWindow = (TextEditorWindow*)(g_windows[value].get());
-		textEditorWindow->m_caratVisible = !textEditorWindow->m_caratVisible;
-		textEditorWindow->m_render();
-		
-	}
-	glutTimerFunc(1000, TextEditorWindow::ToggleCarat, value);*/
-}
 
 	void TextEditorWindow::DisplayFunc()
 	{
@@ -473,5 +364,11 @@ void TextEditorWindow::ToggleCarat(int value)
 				break;
 			}
 		}
+	}
+	void TextEditorWindow::TimerFunc(int value)
+	{
+		m_caratVisible = !m_caratVisible;
+		DisplayFunc();
+		glutTimerFunc(500, Window::TimerFuncDispatcher, value);
 	}
 }

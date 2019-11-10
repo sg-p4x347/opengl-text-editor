@@ -129,6 +129,12 @@ void Window::SpecialUpFuncDispatcher(int key, int x, int y)
 		g_windows[glutGetWindow()]->SpecialUpFunc(key, x, y);
 }
 
+void Window::TimerFuncDispatcher(int value)
+{
+	if (g_windows.count(glutGetWindow()))
+		g_windows[glutGetWindow()]->TimerFunc(value);
+}
+
 void Window::DisplayFunc()
 {
 }
@@ -163,6 +169,10 @@ void Window::SpecialFunc(int key, int x, int y)
 void Window::SpecialUpFunc(int key, int x, int y)
 {
 	m_specialKeys[key] = false;
+}
+
+void Window::TimerFunc(int value)
+{
 }
 
 shared_ptr<Window> Window::Create(shared_ptr<Window> window)

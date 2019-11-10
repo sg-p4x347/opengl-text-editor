@@ -44,7 +44,6 @@ int main(int argc, char ** argv) {
 
 	// create a specialized text-editor window
 	auto textEditorWindow = Window::Create(std::make_shared<ote::TextEditorWindow>());
-	glutTimerFunc(1000, ote::TextEditorWindow::ToggleCarat, textEditorWindow->GetID());
 	glutMainLoop();
 	
 	return 0;

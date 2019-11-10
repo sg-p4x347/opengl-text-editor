@@ -198,6 +198,9 @@ uint32_t FontUtil::NearestCharacterIndex(string text, string font, int size, int
 			}
 			
 		}
+		else {
+			cursorIndex++;
+		}
 	}
 
 	// The offset does not lie between indices, therefore it must associate with the length of the text
