@@ -9,7 +9,11 @@ TextEditorWindow::TextEditorWindow() :
 	m_lineSpacing(12),
 	m_caratVisible(true),
 	m_editorPos(0.f,12.f)
+	
 {
+
+	addToButtonVector(Button("untitled", Vector2(0.0f, 0.0f),0 ,0));
+	
 	m_textEditor.NewDocument();
 }
 
@@ -128,6 +132,63 @@ void TextEditorWindow::RenderWord(Word& word, Vector2& pen, size_t& rowHeight, u
 	}
 }
 
+void TextEditorWindow::addToButtonVector(Button button)
+{
+	docTabs.push_back(button);
+}
+
+void TextEditorWindow::deleteFromButtonVector(Button button)
+{
+	// to do
+}
+
+void TextEditorWindow::createTabs()
+{
+	int i = 0;
+	vector<shared_ptr<Document>> docs = m_textEditor.GetDocuments();
+	for (shared_ptr<Document> doc : docs){
+		string text = doc->GetName();
+		double w = 50;
+		double h = 12;
+		double x = 4;
+		double y = 13;
+		glColor3f(0, 0, 1);
+		glLineWidth(1);
+		glBegin(GL_LINE_LOOP);
+		Vector2 one((x + (w * i*1.1)),y);
+		Vector2 two(((x + (w * i*1.1)) + w), y);
+		Vector2 three(((x + (w * i*1.1)) + w), (y - h));
+		Vector2 four((x + (w * i*1.1)), (y - h));
+		one = Window::ScreenToWorld(one);
+		two = Window::ScreenToWorld(two);
+		three = Window::ScreenToWorld(three);
+		four = Window::ScreenToWorld(four);
+		glVertex2f((GLfloat)one.x, (GLfloat)one.y);
+		glVertex2f((GLfloat)two.x, (GLfloat)two.y);
+		glVertex2f((GLfloat)three.x, (GLfloat)three.y);
+		glVertex2f((GLfloat)four.x, (GLfloat)four.y);
+		glEnd();
+		glRasterPos2f(one.x+.007,one.y+.01);
+		if (text.size() > 7) {
+			text = text.substr(0, 7) + "...";
+		}
+		
+		for (int i = 0; i < text.size(); ++i)
+		{
+			glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_10, text.at(i));
+		}
+
+
+
+		i= i+1;
+	}
+	glLineWidth(1);
+	glBegin(GL_LINES);
+	glVertex2f(0, 0.9675);
+	glVertex2f(1, 0.9675);
+	glEnd();
+}
+
 void TextEditorWindow::ToggleCarat(int value)
 {
 	/*if (g_windows.count(value)) {
@@ -154,6 +215,9 @@ void TextEditorWindow::DisplayFunc()
 			RenderWord(word, pen, rowHeight, charIndex, carat, windowWidth);
 
 		}
+		// Draw tabs
+		createTabs();
+
 		// flush out the buffer contents
 		glFlush();
 	}
