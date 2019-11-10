@@ -4,24 +4,15 @@
 #include "FontUtil.h"
 #include "Font.h"
 
-TextEditorWindow::TextEditorWindow() : 
-	Window::Window("Text Editor", Vector2(), Vector2(400,400), 0.0, 1.0, 0.0, 1.0),
-	m_lineSpacing(12),
-	m_caratVisible(true),
-	m_editorPos(0.f,12.f)
-{
-	m_textEditor.NewDocument();
-	InitMenu();
-}
 namespace ote {
-	TextEditorWindow::TextEditorWindow() :
-		Window::Window("Text Editor", Vector2(), Vector2(400, 400), 0.0, 1.0, 0.0, 1.0),
+	TextEditorWindow::TextEditorWindow() : 
+		Window::Window("Text Editor", Vector2(), Vector2(400,400), 0.0, 1.0, 0.0, 1.0),
 		m_lineSpacing(12),
 		m_caratVisible(true),
-		m_editorPos(0.f, 0.f)
+		m_editorPos(0.f,0.f)
 	{
 		m_textEditor.NewDocument();
-
+		InitMenu();
 	}
 
 	int TextEditorWindow::MeasureText(string text, void* font, int fontSize)
