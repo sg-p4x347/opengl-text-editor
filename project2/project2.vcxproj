@@ -162,6 +162,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Bitmap.cpp" />
+    <ClCompile Include="Button.cpp" />
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="Document.cpp" />
     <ClCompile Include="Font.cpp" />
@@ -180,6 +181,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bitmap.h" />
+    <ClInclude Include="Button.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="Font.h" />
     <ClInclude Include="FontUtil.h" />
