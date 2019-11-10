@@ -189,6 +189,8 @@ void TextEditorWindow::createTabs()
 	glEnd();
 }
 
+
+
 void TextEditorWindow::ToggleCarat(int value)
 {
 	/*if (g_windows.count(value)) {
@@ -234,6 +236,8 @@ void TextEditorWindow::MouseFunc(int button, int state, int x, int y)
 			DisplayFunc();
 			break;
 		}
+		case 1:
+			cout << x << " " << y;
 		break;
 	}
 	}
