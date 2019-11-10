@@ -43,14 +43,18 @@ namespace ote {
 		int m_fontMenuID;
 		int m_sizeMenuID;
 		int m_colorMenuID;
+
 		// Menu callbacks
 	public:
-		static void MainMenuCallback(int entryID);
-		static void FontMenuCallback(int entryID);
-		static void SizeMenuCallback(int entryID);
-		static void ColorMenuCallback(int entryID);
+		virtual void MainMenuFunc(int entryID) override;
+		virtual void FontMenuFunc(int entryID) override;
+		virtual void SizeMenuFunc(int entryID) override;
+		virtual void ColorMenuFunc(int entryID) override;
 
 		static void MainMenuDispatcher(int entryID);
+		static void FontMenuDispatcher(int entryID);
+		static void SizeMenuDispatcher(int entryID);
+		static void ColorMenuDispatcher(int entryID);
 
 		TextEditor* getTextEditor();
 	};

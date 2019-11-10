@@ -34,6 +34,10 @@ Window::Window(
 	glutKeyboardUpFunc(Window::KeyboardUpFuncDispatcher);
 	glutSpecialFunc(Window::SpecialFuncDispatcher);
 	glutSpecialUpFunc(Window::SpecialUpFuncDispatcher);
+	glutCreateMenu(Window::MainMenuDispatcher);
+	glutCreateMenu(Window::FontMenuDispatcher);
+	glutCreateMenu(Window::SizeMenuDispatcher);
+	glutCreateMenu(Window::ColorMenuDispatcher);
 	// Initialize rendering configurations
 	glutInitDisplayMode(GLUT_ALPHA);
 	glClearColor(1.f, 1.f, 1.f, 1.f);
@@ -135,6 +139,22 @@ void Window::TimerFuncDispatcher(int value)
 		g_windows[glutGetWindow()]->TimerFunc(value);
 }
 
+void Window::MainMenuDispatcher(int entryID)
+{
+}
+
+void Window::FontMenuDispatcher(int entryID)
+{
+}
+
+void Window::SizeMenuDispatcher(int entryID)
+{
+}
+
+void Window::ColorMenuDispatcher(int entryID)
+{
+}
+
 void Window::DisplayFunc()
 {
 }
@@ -172,6 +192,22 @@ void Window::SpecialUpFunc(int key, int x, int y)
 }
 
 void Window::TimerFunc(int value)
+{
+}
+
+void Window::MainMenuFunc(int entryID)
+{
+}
+
+void Window::FontMenuFunc(int entryID)
+{
+}
+
+void Window::SizeMenuFunc(int entryID)
+{
+}
+
+void Window::ColorMenuFunc(int entryID)
 {
 }
 
