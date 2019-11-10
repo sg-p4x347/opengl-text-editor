@@ -136,7 +136,7 @@ void Window::SpecialUpFuncDispatcher(int key, int x, int y)
 void Window::TimerFuncDispatcher(int value)
 {
 	if (g_windows.count(glutGetWindow()))
-		g_windows[glutGetWindow()]->TimerFunc(value);
+		g_windows[value]->TimerFunc(value);
 }
 
 void Window::MainMenuDispatcher(int entryID)
