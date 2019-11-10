@@ -8,5 +8,6 @@ struct Word
 	string Font;
 	size_t Size;
 	Color Colour;
+	bool NewlineHandled;
 };
 

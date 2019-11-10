@@ -38,9 +38,9 @@ namespace ote {
 	uint32_t TextEditorWindow::NearestCharacterIndex(Vector2 screenPos)
 	{
 
-		queue<Word> words;
-		for (auto& word : m_words) {
-			words.push(word);
+		stack<Word> words;
+		for (auto it = m_words.rbegin(); it != m_words.rend(); it++) {
+			words.push(*it);
 		}
 		int rowBottom = m_editorPos.y;
 		vector<Word> row;
@@ -109,34 +109,40 @@ namespace ote {
 		}
 	}
 
-	vector<Word> TextEditorWindow::GenerateRow(queue<Word>& words)
+	vector<Word> TextEditorWindow::GenerateRow(stack<Word>& words)
 	{
 		int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
 		int x = m_editorPos.x;
 
 		vector<Word> row;
 		while (!words.empty()) {
-			Word word = words.front();
+			Word word = words.top();
 			words.pop();
 			
 			size_t carriageReturnOffset = 0;
-			if (word.Text[0] == '\r')
-				carriageReturnOffset = 1;
-			uint32_t index = std::min(FontUtil::NearestCharacterIndex(word.Text, word.Font, word.Size, windowWidth - x, true), (uint32_t)word.Text.find('\r', carriageReturnOffset));
-			if (carriageReturnOffset <= index && index < word.Text.length() || x >= windowWidth) {
-				if (index < word.Text.length()) {
-					// Split this word and recursively render each part on separate lines
-					Word left(word.Text.substr(0, index), word.Font, word.Size, word.Colour);
-					word.Text = word.Text.substr(index);
-					row.push_back(left);
-				}
-				// word wrap
+			if (!word.NewlineHandled && word.Text[0] == '\r') {
+				word.NewlineHandled = true;
 				words.push(word);
 				break;
 			}
-			else if (index == word.Text.length()) {
-				row.push_back(word);
-				x += FontUtil::MeasureText(word.Text, word.Font, word.Size);
+			else {
+				uint32_t index = std::min(FontUtil::NearestCharacterIndex(word.Text, word.Font, word.Size, windowWidth - x, true), (uint32_t)word.Text.find('\r', 1));
+				if (index < word.Text.length()) {
+					if (index > 0 && index < word.Text.length()) {
+						// Split this word and recursively render each part on separate lines
+						Word left(word.Text.substr(0, index), word.Font, word.Size, word.Colour);
+						word.Text = word.Text.substr(index);
+						row.push_back(left);
+					}
+					// word wrap
+					word.NewlineHandled = true;
+					words.push(word);
+					break;
+				}
+				else if (index == word.Text.length()) {
+					row.push_back(word);
+					x += FontUtil::MeasureText(word.Text, word.Font, word.Size);
+				}
 			}
 		}
 		return row;
@@ -336,9 +342,9 @@ void TextEditorWindow::InitMenu()
 			uint32_t charIndex = 0;
 
 			if (!m_words.empty()) {
-				queue<Word> words;
-				for (auto word : m_words) {
-					words.push(word);
+				stack<Word> words;
+				for (auto it = m_words.rbegin(); it != m_words.rend(); it++) {
+					words.push(*it);
 				}
 				// Render one row at a time
 				while (!words.empty()) {
