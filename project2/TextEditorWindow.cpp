@@ -76,7 +76,7 @@ namespace ote {
 
 			uint32_t charIndex = 0;
 			uint32_t styleStart = 0;
-			uint32_t styleSize = 1;
+			uint32_t styleSize = 0;
 			while (charIndex < document.GetLength()) {
 				auto& fontStyle = document.GetFonts()[fontIndex];
 				auto& sizeStyle = document.GetSizes()[sizeIndex];
@@ -104,15 +104,19 @@ namespace ote {
 					colorStart += colorStyle.Size;
 					styleChanged = true;
 				}
+				
 				// A style has changed, render this section of the document
 				if (styleChanged || charIndex == document.GetLength() - 1) {
+					if (!styleChanged && charIndex == document.GetLength() - 1)
+						styleSize++;
 					string text = document.GetText().substr(styleStart, styleSize);
 					m_words.push_back(Word(text, fontStyle.Data, sizeStyle.Data, colorStyle.Data));
 					styleSize = 0;
 					styleStart = charIndex;
 				}
-				styleSize++;
 				charIndex++;
+				styleSize++;
+				
 			}
 		}
 	}
@@ -180,14 +184,14 @@ namespace ote {
 		while (!words.empty()) {
 			Word word = words.front();
 			words.pop();
-			uint32_t index = std::min(FontUtil::NearestCharacterIndex(word.Text, word.Font, word.Size, windowWidth - x), word.Text.find('\r'));
-
-			if (index < word.Text.length() || x >= windowWidth) {
+			uint32_t index = FontUtil::NearestCharacterIndex(word.Text, word.Font, word.Size, windowWidth - x, true);
+			uint32_t carriageReturn = word.Text.find('\r');
+			if (index < word.Text.length() || x >= windowWidth || carriageReturn != string::npos) {
 
 				if (index < word.Text.length()) {
 					// Split this word and recursively render each part on separate lines
-					Word left(word.Text.substr(0, index + 1), word.Font, word.Size, word.Colour);
-					word.Text = word.Text.substr(index + 1);
+					Word left(word.Text.substr(0, carriageReturn != string::npos ? index + 1 : index), word.Font, word.Size, word.Colour);
+					word.Text = word.Text.substr(carriageReturn != string::npos ? index + 1 : index);
 					row.push_back(left);
 				}
 				// word wrap
@@ -384,7 +388,8 @@ namespace ote {
 				break;
 			default:
 				document.InsertText(string(1, (char)key), selectionBegin);
-				MoveCarat(document, selectionBegin + 1,true);
+				MoveCarat(document, selectionBegin + 1, true);
+				
 
 				UpdateWords();
 				break;

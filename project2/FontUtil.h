@@ -25,6 +25,7 @@ public:
 		// The color to use
 		Color color
 	);
+
 	// Returns the index within the string that is closest to the pixel offset given
 	static uint32_t NearestCharacterIndex(
 		// The text to measure
@@ -34,7 +35,9 @@ public:
 		// The font height in pixels
 		int size,
 		// The pixel offset from the start of the text
-		int offset
+		int offset,
+		// If true, the returned index will not extend beyond the offset
+		bool noPass = false
 	);
 	// Returns the length of the given text rendered in the specified font and size
 	static int MeasureText(

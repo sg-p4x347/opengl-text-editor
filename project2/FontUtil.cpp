@@ -135,7 +135,8 @@ void FontUtil::Render(Window& window, Vector2 position, string text, string font
 	}
 }
 
-uint32_t FontUtil::NearestCharacterIndex(string text, string font, int size, int offset)
+
+uint32_t FontUtil::NearestCharacterIndex(string text, string font, int size, int offset, bool noPass)
 {
 	// The nearest index will always be the first index if the offset is negative
 	if (offset <= 0)
@@ -190,6 +191,9 @@ uint32_t FontUtil::NearestCharacterIndex(string text, string font, int size, int
 			cursorIndex++;
 
 			if (lastCursorPos <= offset && cursorPos >= offset) {
+				if (noPass)
+					return std::max(0,lastCursorIndex);
+
 				return (offset - lastCursorPos < cursorPos - offset) ? lastCursorIndex : cursorIndex;
 			}
 			

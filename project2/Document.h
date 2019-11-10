@@ -115,8 +115,10 @@ inline uint32_t Document::RemoveStyle(vector<Style<DataType>>& styles, uint32_t 
 			}
 			// The new style overlaps the end of the current style
 			else if (end >= currentEnd) {
-				currentStyle.Size = start - currentStart;
-				styles[i] = currentStyle;
+				styles[i].Size = start - currentStart;
+				if (end == currentEnd) {
+					break;
+				}
 				i++;
 			}
 			// The new style overlaps the start of the current style
