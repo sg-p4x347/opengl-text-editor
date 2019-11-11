@@ -254,14 +254,35 @@ namespace ote {
 
 void TextEditorWindow::InitMenu()
 {
-	m_fontMenuID = glutCreateMenu(TextEditorWindow::FontMenuDispatcher);
 	vector<string> fontNames = TextEditorWindow::getFontFamilies();
+	vector<char> requiredAlphabet;
+	vector<int> alphabetMenuIDs;
+	int fontIndex = 0;
 	for (int index = 0; index < fontNames.size(); ++index)
 	{
-		glutAddMenuEntry(fontNames[index].c_str(), index);
+		if (requiredAlphabet.size() == 0 || requiredAlphabet[requiredAlphabet.size() - 1] != fontNames[index][0])
+		{
+			requiredAlphabet.push_back(fontNames[index][0]);
+			alphabetMenuIDs.push_back(glutCreateMenu(TextEditorWindow::FontMenuDispatcher));
+			glutAddMenuEntry(fontNames[fontIndex].c_str(), fontIndex);
+		}
+		else
+		{
+			glutAddMenuEntry(fontNames[fontIndex].c_str(), fontIndex);
+		}
+		++fontIndex;
+	}
+	
+
+	m_fontMenuID = glutCreateMenu(TextEditorWindow::FontMenuDispatcher);
+	for (int index = 0; index < requiredAlphabet.size(); ++index)
+	{
+		string ch = "";
+		ch.push_back(requiredAlphabet[index]);
+		glutAddSubMenu(ch.c_str(), alphabetMenuIDs[index]);
 	}
 	m_sizeMenuID = glutCreateMenu(TextEditorWindow::SizeMenuDispatcher);
-	for (int size = 8; size <= 24; ++size)
+	for (int size = 8; size <= 38; ++size)
 	{
 		glutAddMenuEntry(std::to_string(size).c_str(), size);
 	}
@@ -278,7 +299,7 @@ void TextEditorWindow::InitMenu()
 	glutAddMenuEntry("Save Current Text", 0);
 	glutAddMenuEntry("Exit", -1);
 
-		glutAttachMenu(GLUT_RIGHT_BUTTON);
+	glutAttachMenu(GLUT_RIGHT_BUTTON);
 	}
 
 	void TextEditorWindow::MainMenuFunc(int entryID)
