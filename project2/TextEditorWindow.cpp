@@ -25,15 +25,18 @@ namespace ote {
 
 
 	{
+		try {
+			m_textEditor.NewDocument();
 
-		m_textEditor.NewDocument();
+			InitMenu();
 
-		InitMenu();
+			glutTimerFunc(500, Window::TimerFuncDispatcher, m_id);
 
-		glutTimerFunc(500, Window::TimerFuncDispatcher, m_id);
+			UpdateWords();
+		}
+		catch (std::exception ex) {
 
-		UpdateWords();
-
+		}
 	}
 
 	vector<string> TextEditorWindow::getFontFamilies()
@@ -560,7 +563,7 @@ namespace ote {
 
 		case -1:
 
-			exit(0);
+			quick_exit(0);
 
 		}
 
