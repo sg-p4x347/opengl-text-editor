@@ -189,9 +189,10 @@ size_t FontUtil::GetMaxSize()
 	return m_maxSize;
 }
 
-vector<string> FontUtil::ListFonts()
+vector<vector<string>> FontUtil::ListFonts()
 {
 	vector<string> fontFamilyNames;
+	vector<string> fileNames;
 	for (const auto& dirEntry : std::filesystem::directory_iterator(m_fontDirectory))
 		if (dirEntry.path().string()[dirEntry.path().string().size() - 1] == 'f') {
 			string temp = dirEntry.path().string();
@@ -202,9 +203,10 @@ vector<string> FontUtil::ListFonts()
 			FT_Face face;
 			FTC_Manager_LookupFace(Get().m_cacheManager, faceId, &face);
 
-			if (fontFamilyNames.size() == 0 || fontFamilyNames[fontFamilyNames.size() - 1] != face->family_name) {
+			if (face && (fontFamilyNames.size() == 0 || fontFamilyNames[fontFamilyNames.size() - 1] != face->family_name)) {
 				fontFamilyNames.push_back(face->family_name);
+				fileNames.push_back(temp);
 			}
 		}
-	return fontFamilyNames;
+	return vector<vector<string>> { fontFamilyNames, fileNames };
 }
