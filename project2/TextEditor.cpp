@@ -5,6 +5,11 @@ TextEditor::TextEditor()
 {
 }
 
+void TextEditor::SetActiveDocument(shared_ptr<Document> doc)
+{
+	m_active = doc;
+}
+
 shared_ptr<Document> TextEditor::GetActiveDocument()
 {
 	return m_active;

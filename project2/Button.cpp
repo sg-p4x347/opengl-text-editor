@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "Button.h"
-
+#include "pch.h"
 Button::Button()
 {
 	setText("button");

@@ -2,7 +2,7 @@
 #include "Document.h"
 #include "FontUtil.h"
 Document::Document() : 
-	m_name("document"),
+	m_name("typed"),
 	m_caratPosition(0),
 	m_selectionStart(0),
 
