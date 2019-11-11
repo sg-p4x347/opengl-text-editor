@@ -1,23 +1,28 @@
 /*-----------------------------------------------------------------------------------------
- COURSE:				CSC525
- PROGRAMMERS:			Gage Coates (Coates347)
- MODIFIED BY:			Gage Coates (Coates347)
- DATE MODIFIED:			
-
- FOLDER:				
- DESCRIPTION:			This is a basic text editing program that supports multiple fonts, colors, and sizes of text. 
+ COURSE:				CSC525-001: Project 2
+ PROGRAMMERS:			Gage Coates		(Coates347)
+						Paul Durham		(Durham321)
+						Anthony Harris	(bob999)
+ Last MODIFIED:			11/10/2019 22:00
+ DESCRIPTION:			This is a basic text editing program that supports multiple fonts, 
+						colors, and sizes of text. 
 						Features include:
-							- Context menu (right click the text editor window)
-							- Text coloring (options available in the context menu)
-							- Multiple font sizes (options available in the context menu)
-							- All standard fonts supported by Windows (options avialable in the context menu)
-							- Arbitrary text selection (click and drag to select sequential characters)
-							- Carat positioning (click to move the carat between characters)
-							- Save text to a file (availible in the context menu)
-							- Quit (avialable in the context menu)
-
- NOTE:					N/A
- FILES:					
+							- Context menu 
+								- (right click the text editor window)
+							- Text coloring 
+								- (options available in the context menu)
+							- Multiple font sizes 
+								- (options available in the context menu)
+							- All standard fonts supported by Windows 
+								- (options avialable in the context menu)
+							- Arbitrary text selection 
+								- (click and drag to select sequential characters)
+							- Carat positioning 
+								- (click to move the carat between characters)
+							- Save text to a file 
+								- (availible in the context menu)
+							- Quit 
+								- (avialable in the context menu)
  IDE/COMPILER:			MicroSoft Visual Studio 2019
  INSTRUCTION FOR COMPILATION AND EXECUTION:
 	1.		Double click on project2.sln	to OPEN the project
