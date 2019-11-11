@@ -54,6 +54,10 @@
 						9) User can terminate the program from menu option
 							- Fulfilled by implementation of MainMenuFunc in
 							  TextEditorWindow class
+
+ Dependencies:			FreeType 2 is utilized in font rendering
+							- https://www.freetype.org/
+
  IDE/COMPILER:			MicroSoft Visual Studio 2019
  INSTRUCTION FOR COMPILATION AND EXECUTION:
 	1.		Double click on project2.sln	to OPEN the project
