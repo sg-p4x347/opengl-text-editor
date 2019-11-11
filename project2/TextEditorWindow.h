@@ -36,6 +36,7 @@ namespace ote {
 		void MoveCarat(Document& document, uint32_t position, bool disableSelect = false, bool selectionOverride = true);
 		void FillRect(Rectangle rect, Color color);
 		void GlVertex(Vector2 point);
+		void createTabs();
 	private:
 		int m_lineSpacing;
 		Vector2 m_editorPos;
