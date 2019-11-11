@@ -5,7 +5,17 @@
  DATE MODIFIED:			
 
  FOLDER:				
- DESCRIPTION:			
+ DESCRIPTION:			This is a basic text editing program that supports multiple fonts, colors, and sizes of text. 
+						Features include:
+							- Context menu (right click the text editor window)
+							- Text coloring (options available in the context menu)
+							- Multiple font sizes (options available in the context menu)
+							- All standard fonts supported by Windows (options avialable in the context menu)
+							- Arbitrary text selection (click and drag to select sequential characters)
+							- Carat positioning (click to move the carat between characters)
+							- Save text to a file (availible in the context menu)
+							- Quit (avialable in the context menu)
+
  NOTE:					N/A
  FILES:					
  IDE/COMPILER:			MicroSoft Visual Studio 2019
