@@ -710,14 +710,22 @@ namespace ote {
 				}
 				break;
 			}
+				// If statement for mouse click in tab area
 				if (x > 4 && y < 12) {
+					
+					// Pulls in the vector<shared_ptr<Document>> if click happens in tab area
 					vector<shared_ptr<Document>> docs = m_textEditor.GetDocuments();
+					
+					// Checks click location could be on a tab that exists
 					int length = docs.size();
 					if (x < (length * 50 * 7) + 2) {
 						break;
 					}
-
+					
+					// Since click happens in tab area this will find out which tab is clicked.
 					else {
+						
+						// Sets clicked tab to active document
 						m_textEditor.SetActiveDocument(docs[((x / 57)+2)%10]);
 						break;
 					}
@@ -922,9 +930,14 @@ namespace ote {
 	}
 	void TextEditorWindow::createTabs()
 	{
+		// i keeps track of the number of tabs to adjust draw location
 		int i = 0;
 		vector<shared_ptr<Document>> docs = m_textEditor.GetDocuments();
+		
+		// Iterate over the vector of shared_ptr<Document> and draw tabs
 		for (shared_ptr<Document> doc : docs) {
+			
+			// Get document file name and starting point to draw tabs also set width and height
 			string text = doc->GetName();
 			double w = 50;
 			double h = 12;
@@ -933,22 +946,31 @@ namespace ote {
 			glColor3f(0, 0, 1);
 			glLineWidth(1);
 			glBegin(GL_LINE_LOOP);
+			
+			// Create vector2 objects to find the actual draw ponits
 			Vector2 one((x + (w * i * 1.1)), y);
 			Vector2 textPos = Vector2(one.x + 6, one.y - 3);
 			Vector2 two(((x + (w * i * 1.1)) + w),y);
 			Vector2 three(((x + (w * i * 1.1)) + w), (y - h));
 			Vector2 four((x + (w * i * 1.1)), (y - h));
+			
+			// Use Window::ScreenToWorld function to find the world coordinates
 			one = Window::ScreenToWorld(one);
 			two = Window::ScreenToWorld(two);
 			three = Window::ScreenToWorld(three);
 			four = Window::ScreenToWorld(four);
+			// Draw square tab
 			glVertex2f((GLfloat)one.x, (GLfloat)one.y);
 			glVertex2f((GLfloat)two.x, (GLfloat)two.y);
 			glVertex2f((GLfloat)three.x, (GLfloat)three.y);
 			glVertex2f((GLfloat)four.x, (GLfloat)four.y);
 			glEnd();
+			
+			// Raster the text into the square
 			textPos = Window::ScreenToWorld(textPos);
 			glRasterPos2f(textPos.x, textPos.y);
+			
+			// Truncates the filename to fit in the tab area
 			if (text.size() > 7) {
 				text = text.substr(0, 7) + "...";
 			}
@@ -962,6 +984,8 @@ namespace ote {
 
 			i = i + 1;
 		}
+		
+		// Draw the top line under the tabs
 		glLineWidth(1);
 		glBegin(GL_LINES);
 		Vector2 lineStart(0, m_editorPos.y);
