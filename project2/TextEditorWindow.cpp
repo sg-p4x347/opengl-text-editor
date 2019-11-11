@@ -333,11 +333,13 @@ void TextEditorWindow::InitMenu()
 
 	void TextEditorWindow::DisplayFunc()
 	{
+		Select();
+		// draw the background
+		glClear(GL_COLOR_BUFFER_BIT);
 		int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
 		if (m_textEditor.GetActiveDocument()) {
 			Document& document = *m_textEditor.GetActiveDocument();
-			// draw the background
-			glClear(GL_COLOR_BUFFER_BIT);
+			
 			Vector2 pen = m_editorPos;
 			uint32_t charIndex = 0;
 
@@ -357,9 +359,10 @@ void TextEditorWindow::InitMenu()
 				RenderCarat(Vector2(m_editorPos.x, m_editorPos.y + document.GetSizeAt(0)), document.GetSizeAt(0));
 			}
 
-			// flush out the buffer contents
-			glFlush();
+			
 		}
+		// flush out the buffer contents
+		glFlush();
 	}
 
 	void TextEditorWindow::MouseFunc(int button, int state, int x, int y)

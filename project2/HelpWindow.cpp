@@ -9,6 +9,7 @@ m_splashScreen(Bitmap::FromFile("help_splash_screen.bmp"))
 
 void HelpWindow::DisplayFunc()
 {
+	Select();
 	glClear(GL_COLOR_BUFFER_BIT);
 	glDrawPixels(m_splashScreen.GetWidth(), m_splashScreen.GetHeight(), GL_RGBA, GL_UNSIGNED_BYTE, m_splashScreen.GetPixels());
 }
